@@ -34,7 +34,7 @@ const upload = multer({
 });
 
 function validateFileId(fileId) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(fileId)
+  return /^[0-9a-f-]{1,64}$/i.test(fileId)
 }
 
 // -------------------------------------------------------------------------- //

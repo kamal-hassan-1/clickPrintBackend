@@ -34,6 +34,7 @@ app.use(cors({
 
 const required = [
   'JWT_SECRET',
+  'SERVICE_KEY',
   'MONGODB_URI',
   'NOTIFYBOT_URL',
   'EXPO_ACCESS_TOKEN',

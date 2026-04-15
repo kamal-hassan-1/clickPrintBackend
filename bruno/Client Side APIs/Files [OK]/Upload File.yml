@@ -15,7 +15,7 @@ http:
       - name: file
         type: file
         value:
-          - C:\Users\Ahad\Downloads\20230508_235825.jpg
+          - /home/ahad/Downloads/WhatsApp Image 2026-07-14 at 4.03.01 PM.jpeg
         contentType: image/jpeg
   auth: inherit
 
