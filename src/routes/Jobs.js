@@ -1,32 +1,11 @@
 const express = require('express');
+const router = express.Router();
 
 const { resp } = require('../func');
 
 const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
-
-// -------------------------------------------------------------------------- //
-
-const router = express.Router();
-
-function validatePageSelection(ps) {
-  return true // TODO
-}
-
-function validateSettingsObject(s) {
-  if (!s || typeof s !== 'object') return { valid: false, error: 'settings object cannot be empty' };
-
-  if (typeof s.color !== 'boolean') return { valid: false, error: 'color must be a boolean' };
-  if (typeof s.pageType !== 'string' || s.pageType.trim() === '') return { valid: false, error: 'pageType must be a non-empty string' };
-  if (!Number.isInteger(s.numberOfCopies) || s.numberOfCopies < 1) return { valid: false, error: 'numberOfCopies must be a positive integer' };
-  if (!['portrait', 'landscape'].includes(s.orientation)) return { valid: false, error: 'orientation must be one of ["portrait", "landscape"]' };
-  if (!['single', 'double'].includes(s.sidedness)) return { valid: false, error: 'sidedness must be one of ["single", "double"]' };
-  if (typeof s.pageSelection !== 'string' || !validatePageSelection(s.pageSelection)) return { valid: false, error: 'pageSelection must be a valid selection string' };
-  if (!Number.isInteger(s.pagesPerSheet) || ![1, 2, 4, 8, 16].includes(s.pagesPerSheet)) return { valid: false, error: 'pagesPerSheet must be one of [1, 2, 4, 8, 16]' };
-
-  return { valid: true, error: '' };
-}
 
 // -------------------------------------------------------------------------- //
 

@@ -2,10 +2,20 @@ services:
   mongo:
     image: mongo
     restart: unless-stopped
+    volumes:
+      - mongo:/data/db
 
   gotenberg:
     image: gotenberg/gotenberg:8
     restart: unless-stopped
+  
+  notifybot:
+    image: ghcr.io/ahad19n/notifybot:latest
+    restart: unless-stopped
+    volumes:
+      - notifybot:/data
+    environment:
+      API_KEY: thisisabadapikeythisisabadapikey
 
   mongo-express:
     image: mongo-express
@@ -24,8 +34,8 @@ services:
     volumes:
       - ./files:/app/files
     environment:
-      JWT_SECRET: ${JWT_SECRET}
-      MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
       INTERNAL_URL: http://backend:3000
       GOTENBERG_URL: http://gotenberg:3000
-      NOTIFYBOT_URL: ${NOTIFYBOT_URL}
+      JWT_SECRET: thisisabadsecretthisisabadsecret
+      MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
+      NOTIFYBOT_URL: http://notifybot:3000/send?apiKey=thisisabadapikeythisisabadapikey

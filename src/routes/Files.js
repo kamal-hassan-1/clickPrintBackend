@@ -8,7 +8,7 @@ const File = require('../models/File');
 
 const { resp } = require('../func');
 const { buildFormData } = require('../func');
-const { jwtAuth, keyAuth } = require('../auth');
+const { jwtAuth, keyAuth } = require('../func');
 
 // -------------------------------------------------------------------------- //
 

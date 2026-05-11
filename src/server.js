@@ -2,7 +2,7 @@ const morgan = require('morgan');
 const express = require('express');
 const mongoose = require('mongoose');
 
-const { resp } = require('./func');
+const { resp, jwtAuth } = require('./func');
 
 // -------------------------------------------------------------------------- //
 
@@ -37,9 +37,9 @@ for (const v of required) {
 // -------------------------------------------------------------------------- //
 
 mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('[INFO] Successfully connected to mongo'))
+.then(() => console.log('[INFO] Successfully connected to MongoDB'))
 .catch(err => {
-  console.error('[ERROR] Failed to connect to mongo:', err);
+  console.error('[ERROR] Failed to connect to MongoDB:', err);
   process.exit(1);
 });
 

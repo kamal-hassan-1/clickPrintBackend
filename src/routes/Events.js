@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const { sseClients } = require('../func');
+const { jwtAuth, sseClients } = require('../func');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/', async (req, res) => {
+router.get('/', jwtAuth, async (req, res) => {
+  if (req.token.actor !== 'shop') return resp(res, 403, 'Forbidden');
+
   res.set({
     'Connection': 'keep-alive',
     'Cache-Control': 'no-cache',
@@ -13,17 +15,17 @@ router.get('/', async (req, res) => {
   });
 
   res.flushHeaders();
-  sseClients.set(req.user.id, res);
+  sseClients.set(req.token.shop._id, res);
 
   // Initial hello so the client knows it's connected
-  res.write(`event: connected\ndata: ${JSON.stringify({ clientId })}\n\n`);
+  res.write(`event: connected\ndata: ${ req.token.shop._id }\n\n`);
 
   // Heartbeat to keep proxies from killing idle connections
-  const heartbeat = setInterval(() => res.write(': ping\n\n'), 15000);
+  const heartbeat = setInterval(() => res.write(': keepalive\n\n'), 15000);
 
   req.on('close', () => {
     clearInterval(heartbeat);
-    sseClients.delete(req.user.id);
+    sseClients.delete(req.token.shop._id);
   });
 });
 
