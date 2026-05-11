@@ -5,7 +5,7 @@ const { sseClients } = require('../func');
 
 // -------------------------------------------------------------------------- //
 
-app.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
   res.set({
     'Connection': 'keep-alive',
     'Cache-Control': 'no-cache',
@@ -26,3 +26,7 @@ app.get('/', async (req, res) => {
     sseClients.delete(req.user.id);
   });
 });
+
+// -------------------------------------------------------------------------- //
+
+module.exports = router;

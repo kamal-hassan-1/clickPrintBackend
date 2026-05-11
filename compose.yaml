@@ -25,7 +25,7 @@ services:
       - ./files:/app/files
     environment:
       JWT_SECRET: ${JWT_SECRET}
-      NOTIFYBOT_URL: ${NOTIFYBOT_URL}
-      ABSOLUTE_URI: http://backend:3000
-      GOTENBERG_URI: http://gotenberg:3000
       MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
+      INTERNAL_URL: http://backend:3000
+      GOTENBERG_URL: http://gotenberg:3000
+      NOTIFYBOT_URL: ${NOTIFYBOT_URL}
