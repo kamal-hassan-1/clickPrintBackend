@@ -2,9 +2,9 @@ const express = require('express');
 
 const { resp } = require('../func');
 
-const Job = require('../models/Job.model');
-const File = require('../models/File.model');
-const Shop = require('../models/Shop.model');
+const Job = require('../models/Job');
+const File = require('../models/File');
+const Shop = require('../models/Shop');
 
 // -------------------------------------------------------------------------- //
 

@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { resp } = require('../func');
-const Shop = require('../models/Shop.model');
+const Shop = require('../models/Shop');
 
 // -------------------------------------------------------------------------- //
 

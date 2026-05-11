@@ -4,7 +4,7 @@ const multer = require('multer');
 const express = require('express');
 const { pipeline } = require('stream/promises');
 
-const File = require('../models/File.model');
+const File = require('../models/File');
 
 const { resp } = require('../func');
 const { buildFormData } = require('../func');

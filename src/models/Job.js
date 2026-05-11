@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const Shop = require('./Shop.model');
-const User = require('./User.model');
+const Shop = require('./Shop');
+const User = require('./User');
 
 const settingsSchema = new mongoose.Schema({
   color: { type: Boolean, required: true },

@@ -1,8 +1,8 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
-const Otp = require('../models/Otp.model');
-const User = require('../models/User.model');
+const Otp = require('../models/Otp');
+const User = require('../models/User');
 
 const { resp } = require('../func');
 const { isValidE164NoPlus, generateOtpCode, sendViaNotifyBot } = require('../func');

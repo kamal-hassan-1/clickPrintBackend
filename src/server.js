@@ -60,7 +60,15 @@ app.get('/health', async (req, res) => {
 
 // -------------------------------------------------------------------------- //
 
-app.use('/api', require('./routes'));
+app.use('/events', require('./routes/Events.controller.js'));
+
+router.use('/api/auth', require('./routes/Auth.js'));
+router.use('/api/files', require('./routes/Files.js'));
+
+router.use('/api/jobs', jwtAuth, require('./routes/Jobs.js'));
+router.use('/api/shops', jwtAuth, require('./routes/Shops.js'));
+router.use('/api/history', jwtAuth, require('./routes/History.js'));
+router.use('/api/profile', jwtAuth, require('./routes/Profile.js'));
 
 // -------------------------------------------------------------------------- //
 
