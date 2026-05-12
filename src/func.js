@@ -33,7 +33,7 @@ exports.generateOtpCode = (length) => {
 // -------------------------------------------------------------------------- //
 
 exports.sendViaNotifyBot = async (number, message) => {
-  return await fetch(process.env.NOTIFYBOT_URI, {
+  return await fetch(process.env.NOTIFYBOT_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

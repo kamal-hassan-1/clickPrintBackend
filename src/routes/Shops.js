@@ -1,16 +1,13 @@
 const express = require('express');
+const router = express.Router();
 
 const { resp } = require('../func');
 const Shop = require('../models/Shop');
 
 // -------------------------------------------------------------------------- //
 
-const router = express.Router();
-
-// -------------------------------------------------------------------------- //
-
 router.get('/', async (req, res) => {
-  return resp(res, 200, 'Fetched Shops Successfully', {
+  return resp(res, 200, 'Shops fetched successfully', {
     shops: await Shop.find()
   });
 });

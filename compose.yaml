@@ -1,3 +1,7 @@
+volumes:
+  mongo:
+  notifybot:
+
 services:
   mongo:
     image: mongo

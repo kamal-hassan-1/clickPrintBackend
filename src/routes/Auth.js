@@ -68,7 +68,10 @@ router.post('/verify', async (req, res) => {
     { upsert: true, new: true }
   );
 
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+  const token = jwt.sign({
+    user,
+    actor: 'user'
+  }, process.env.JWT_SECRET);
   return resp(res, 200, 'Verified OTP Successfully', { token, profile: user });
 });
 
