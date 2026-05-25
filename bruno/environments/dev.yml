@@ -1,0 +1,6 @@
+name: dev
+variables:
+  - name: host
+    value: http://localhost:3000
+  - secret: true
+    name: token

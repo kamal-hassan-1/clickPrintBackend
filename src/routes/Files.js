@@ -5,8 +5,17 @@ const express = require('express');
 const { pipeline } = require('stream/promises');
 
 const File = require('../models/File');
+const { resp } = require('../func/misc');
 
-const { resp, buildFormData } = require('../func/misc');
+// -------------------------------------------------------------------------- //
+
+function buildFormData(fields) {
+  const form = new FormData();
+  for (const [key, value] of Object.entries(fields)) {
+    form.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
+  }
+  return form;
+}
 
 // -------------------------------------------------------------------------- //
 

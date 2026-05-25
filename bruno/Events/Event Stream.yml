@@ -1,0 +1,17 @@
+info:
+  name: Event Stream
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{host}}/events"
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RvciI6InNob3AiLCJzaG9wIjp7Il9pZCI6IjY5YTRmY2ZmNmJjZWM1N2ZmMzQ4MTM1ZSJ9fQ.kpzurCCVzNUnQHg3LRMemtdyzRj0P_CgY5OtqQUFiAM
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,25 @@
+info:
+  name: Update Job Status
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{host}}/api/jobs/:jobId/status"
+  params:
+    - name: jobId
+      value: 6a0454964a38bda31db26e4a
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "status": "submitted"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

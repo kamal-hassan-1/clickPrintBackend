@@ -1,0 +1,47 @@
+info:
+  name: Create New Job
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/api/jobs"
+  body:
+    type: json
+    data: |-
+      {
+        "forShop": "69a4fcff6bcec57ff348135e",
+        "files": [
+          {
+            "hash": "8c4d4acc360760fac5245fe39b9ce7a3",
+            "settings": {
+              "pageType": "A4",
+              "color": true,
+              "pageSelection": "1,3,16-20,25",
+              "orientation": "landscape",
+              "pagesPerSheet": 2,
+              "numberOfCopies": 5,
+              "sidedness": "long"
+            }
+          },
+          {
+            "hash": "d804c5ff30528f4fa2ad46dda491f310",
+            "settings": {
+              "pageType": "A4",
+              "color": true,
+              "pageSelection": "1,3,16-20,25",
+              "orientation": "landscape",
+              "pagesPerSheet": 2,
+              "numberOfCopies": 5,
+              "sidedness": "single"
+            }
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
