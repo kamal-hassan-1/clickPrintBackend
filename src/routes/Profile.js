@@ -8,7 +8,7 @@ const User = require('../models/User');
 
 router.get('/', async (req, res) => {
   return resp(res, 200, 'Profile fetched successfully', {
-    profile: await User.findById(req.token.user._id)
+    profile: await User.findById(req.token.uid)
   });
 });
 
@@ -17,7 +17,7 @@ router.patch('/', async (req, res) => {
   if (!name) return resp(res, 400, 'Missing or invalid fields (name)');
 
   const user = await User.findByIdAndUpdate(
-    req.token.user._id, { name }, { returnDocument: 'after' }
+    req.token.uid, { name }, { returnDocument: 'after' }
   );
 
   return resp(res, 200, 'Profile updated successfully', { profile: user });

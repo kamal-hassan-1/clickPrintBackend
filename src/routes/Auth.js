@@ -111,11 +111,10 @@ router.post('/verify', async (req, res) => {
     profile = shopAdmin.shop;
   }
 
-  const token = jwt.sign(
-    { uid: user._id, actor },
-    process.env.JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+  const payload = { uid: user._id, actor };
+  if (actor === 'shop') payload.shopId = profile._id;
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
   return resp(res, 200, 'otp verified', { token, profile });
 });
