@@ -1,9 +1,7 @@
 {
   "name": "clickprintbackend",
   "scripts": {
-    "dev": "nodemon --env-file-if-exists=.env src/server.js",
-    "dev:docker": "nodemon --exec \"docker compose build && docker compose up -d\"",
-    "seed": "node --env-file=.env scripts/seed.js"
+    "dev": "nodemon --exec \"docker compose build && docker compose up -d\""
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
