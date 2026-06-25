@@ -70,3 +70,7 @@ async function runSideEffects(targetStatus, job, session) {
     await effect(job, session);
   }
 }
+
+// -------------------------------------------------------------------------- //
+
+module.exports = { validateTransition, runSideEffects };

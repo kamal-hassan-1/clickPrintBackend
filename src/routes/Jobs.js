@@ -43,55 +43,30 @@ router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res, next)
     return resp(res, 400, 'missing or invalid fields (status)');
   }
 
-  const session = await mongoose.startSession();
   try {
-    let updatedJob;
-    await session.withTransaction(async () => {
-      const job = await Job.findById(jobId).session(session);
-      if (!job) {
-        const err = new Error('not found');
-        err.status = 404;
-        throw err;
-      }
+    const job = await Job.findById(jobId);
+    if (!job) return resp(res, 404, 'not found');
 
-      if (role === 'shop' && !job.forShop.equals(req.token.shopId)) {
-        const err = new Error('forbidden');
-        err.status = 403;
-        throw err;
-      }
-      if (role === 'user' && !job.createdBy.equals(req.token.uid)) {
-        const err = new Error('forbidden');
-        err.status = 403;
-        throw err;
-      }
+    if (role === 'shop' && !job.forShop.equals(req.token.shopId)) return resp(res, 403, 'forbidden');
+    if (role === 'user' && !job.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
-      const check = validateTransition(job.status, nextStatus, role);
-      if (!check.ok) {
-        const err = new Error(check.message);
-        err.status = check.code;
-        throw err;
-      }
+    const check = validateTransition(job.status, nextStatus, role);
+    if (!check.ok) return resp(res, check.code, check.message);
 
-      job.status = nextStatus;
-      job.statusHistory.push({ status: nextStatus, by: role, at: new Date() });
-      await job.save({ session });
+    job.status = nextStatus;
+    job.statusHistory.push({ status: nextStatus, by: role, at: new Date() });
+    await job.save();
 
-      await runSideEffects(nextStatus, job, session);
+    await runSideEffects(nextStatus, job);
 
-      updatedJob = job;
-    });
-
-    const shopId = updatedJob.forShop.toString();
+    const shopId = job.forShop.toString();
     if (sseClients.has(shopId)) {
       sseClients.get(shopId).write(`event: jobStatusUpdate\ndata: ${JSON.stringify({ jobId, status: nextStatus })}\n\n`);
     }
 
-    return resp(res, 200, 'job status updated', updatedJob);
+    return resp(res, 200, 'job status updated', job);
   } catch (err) {
-    if (err.status) return resp(res, err.status, err.message);
     next(err);
-  } finally {
-    session.endSession();
   }
 });
 
