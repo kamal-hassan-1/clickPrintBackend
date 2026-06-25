@@ -34,13 +34,13 @@ router.get('/{:jobId}', async (req, res) => {
   return resp(res, 200, 'fetched all jobs', jobs);
 });
 
-router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res) => {
+router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res, next) => {
   const { jobId } = req.params;
   const { status: nextStatus } = req.body;
   const role = req.token.actor;
 
   if (!nextStatus) {
-    return res.status(400).json({ error: 'status is required' });
+    return resp(res, 400, 'missing or invalid fields (status)');
   }
 
   const session = await mongoose.startSession();
@@ -49,14 +49,18 @@ router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res) => {
     await session.withTransaction(async () => {
       const job = await Job.findById(jobId).session(session);
       if (!job) {
-        const err = new Error('Job not found');
+        const err = new Error('not found');
         err.status = 404;
         throw err;
       }
 
-      // Optional: enforce ownership — a user can only act on their own jobs
-      if (role === 'user' && String(job.userId) !== String(req.token.sub)) {
-        const err = new Error('Forbidden');
+      if (role === 'shop' && !job.forShop.equals(req.token.shopId)) {
+        const err = new Error('forbidden');
+        err.status = 403;
+        throw err;
+      }
+      if (role === 'user' && !job.createdBy.equals(req.token.uid)) {
+        const err = new Error('forbidden');
         err.status = 403;
         throw err;
       }
@@ -77,35 +81,18 @@ router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res) => {
       updatedJob = job;
     });
 
-    res.json({ job: updatedJob });
+    const shopId = updatedJob.forShop.toString();
+    if (sseClients.has(shopId)) {
+      sseClients.get(shopId).write(`event: jobStatusUpdate\ndata: ${JSON.stringify({ jobId, status: nextStatus })}\n\n`);
+    }
+
+    return resp(res, 200, 'job status updated', updatedJob);
   } catch (err) {
-    if (err.status) return res.status(err.status).json({ error: err.message });
+    if (err.status) return resp(res, err.status, err.message);
     next(err);
   } finally {
     session.endSession();
   }
-});
-
-router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res) => {
-  const { status } = req.body || {};
-  if (!status) return resp(res, 400, 'missing or invalid fields (status)');
-
-  const job = await Job.findById(req.params.jobId);
-  if (!job) return resp(res, 404, "not found");
-
-  if (req.token.actor === 'shop' && !job.forShop.equals(req.token.shopId)) return resp(res, 403, 'forbidden');
-  if (req.token.actor === 'user' && !job.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
-
-  job.status = status;
-  await job.save();
-
-  const shopId = job.forShop.toString();
-
-  if (sseClients.has(shopId)) {
-    sseClients.get(shopId).write(`event: jobStatusUpdate\ndata: ${JSON.stringify({ jobId: req.params.jobId, status })}\n\n`);
-  }
-
-  return resp(res, 200, 'job status updated', job);
 });
 
 router.post('/', async (req, res) => {
