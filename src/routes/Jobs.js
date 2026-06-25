@@ -16,7 +16,7 @@ router.get('/{:jobId}', async (req, res) => {
   let query;
 
   if (req.token.actor === 'shop') query = { forShop: req.token.shopId };
-  else if (req.token.actor === 'user') query = { createdBy: req.token.user._id };
+  else if (req.token.actor === 'user') query = { createdBy: req.token.uid };
   else return resp(res, 403, 'forbidden');
 
   if (req.params.jobId) {
@@ -93,8 +93,8 @@ router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res) => {
   const job = await Job.findById(req.params.jobId);
   if (!job) return resp(res, 404, "not found");
 
-  if (req.token.actor === 'shop' && !job.forShop.equals(req.token.shop._id)) return resp(res, 403, 'forbidden');
-  if (req.token.actor === 'user' && !job.createdBy.equals(req.token.user._id)) return resp(res, 403, 'forbidden');
+  if (req.token.actor === 'shop' && !job.forShop.equals(req.token.shopId)) return resp(res, 403, 'forbidden');
+  if (req.token.actor === 'user' && !job.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
   job.status = status;
   await job.save();

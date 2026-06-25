@@ -16,17 +16,17 @@ router.get('/', async (req, res) => {
   });
 
   res.flushHeaders();
-  sseClients.set(req.token.shop._id, res);
+  sseClients.set(req.token.shopId, res);
 
   // Initial hello so the client knows it's connected
-  res.write(`event: connected\ndata: ${ req.token.shop._id }\n\n`);
+  res.write(`event: connected\ndata: ${ req.token.shopId }\n\n`);
 
   // Heartbeat to keep proxies from killing idle connections
   const heartbeat = setInterval(() => res.write(': keepalive\n\n'), 15000);
 
   req.on('close', () => {
     clearInterval(heartbeat);
-    sseClients.delete(req.token.shop._id);
+    sseClients.delete(req.token.shopId);
   });
 });
 
