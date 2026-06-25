@@ -10,10 +10,10 @@ http:
     type: json
     data: |-
       {
-        "forShop": "69a4fcff6bcec57ff348135e",
+        "forShop": "6a3cded8705669a8f5981125",
         "files": [
           {
-            "hash": "8c4d4acc360760fac5245fe39b9ce7a3",
+            "hash": "b05bebd85697bd1ddd4c019d227530d6",
             "settings": {
               "pageType": "A4",
               "color": true,
@@ -25,7 +25,7 @@ http:
             }
           },
           {
-            "hash": "d804c5ff30528f4fa2ad46dda491f310",
+            "hash": "761a2620ed6b1820151b63a1d06577ff",
             "settings": {
               "pageType": "A4",
               "color": true,

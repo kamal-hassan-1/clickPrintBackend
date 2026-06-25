@@ -131,7 +131,7 @@ router.post('/', upload.single('file'), async (req, res) => {
 
   await File.create({
     fileId: req.file.filename,
-    uploadedBy: req.token.user._id,
+    uploadedBy: req.token.uid,
     numberOfPages: metadata.PageCount,
     originalName: req.file.originalname,
   });

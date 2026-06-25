@@ -15,7 +15,7 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 router.get('/{:jobId}', async (req, res) => {
   let query;
 
-  if (req.token.actor === 'shop') query = { forShop: req.token.shop._id };
+  if (req.token.actor === 'shop') query = { forShop: req.token.shopId };
   else if (req.token.actor === 'user') query = { createdBy: req.token.user._id };
   else return resp(res, 403, 'forbidden');
 
@@ -128,7 +128,7 @@ router.post('/', async (req, res) => {
   const job = await Job.create({
     files, forShop,
     status: 'draft',
-    createdBy: req.token.user._id,
+    createdBy: req.token.uid,
   });
 
   return resp(res, 201, 'new job created', job);
