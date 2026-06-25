@@ -8,7 +8,7 @@ http:
   url: "{{host}}/api/shops/:id"
   params:
     - name: id
-      value: 69a4fcff6bcec57ff348135e
+      value: 6a3cded8705669a8f5981125
       type: path
   body:
     type: json
