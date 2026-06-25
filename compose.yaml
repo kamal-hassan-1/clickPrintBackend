@@ -3,6 +3,11 @@ volumes:
   notifybot:
 
 services:
+  cloudflared:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+  
   mongo:
     image: mongo
     restart: unless-stopped
@@ -21,7 +26,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://mongo
 
   notifybot:
-    image: ghcr.io/ahad19n/notifybot:latest
+    image: ghcr.io/ahad19n/notifybot
     restart: unless-stopped
     volumes:
       - notifybot:/data

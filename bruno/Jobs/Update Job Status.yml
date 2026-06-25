@@ -8,7 +8,7 @@ http:
   url: "{{host}}/api/jobs/:jobId/status"
   params:
     - name: jobId
-      value: 6a0454964a38bda31db26e4a
+      value: 6a3d1d4c024edff2ab33ca56
       type: path
   body:
     type: json

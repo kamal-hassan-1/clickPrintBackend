@@ -13,24 +13,26 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 // -------------------------------------------------------------------------- //
 
 router.get('/{:jobId}', async (req, res) => {
-  let query;
+  let query = {
+    status: {
+      $in: [ 'submitted', 'queued', 'printing' ]
+    }
+  };
 
-  if (req.token.actor === 'shop') query = { forShop: req.token.shopId };
-  else if (req.token.actor === 'user') query = { createdBy: req.token.uid };
+  if (req.token.actor === 'shop') query.forShop = req.token.shopId;
+  else if (req.token.actor === 'user') query.createdBy = req.token.uid;
   else return resp(res, 403, 'forbidden');
 
   if (req.params.jobId) {
-    if (!mongoose.isValidObjectId(req.params.jobId)) {
-      return resp(res, 404, 'not found');
-    }
+    if (!mongoose.isValidObjectId(req.params.jobId)) return resp(res, 404, 'not found');
 
-    const job = await Job.findOne({ _id: req.params.jobId, ...query });
+    const job = await Job.findOne({ _id: req.params.jobId, ...query }).populate('createdBy', 'name number');
     if (!job) return resp(res, 404, 'not found');
 
     return resp(res, 200, 'fetched job', job);
   }
 
-  const jobs = await Job.find(query);
+  const jobs = await Job.find(query).populate('createdBy', 'name number');
   return resp(res, 200, 'fetched all jobs', jobs);
 });
 
