@@ -1,16 +1,21 @@
 const mongoose = require('mongoose');
 
-module.exports = mongoose.model('Shop', new mongoose.Schema({
-
+const shopSchema = new mongoose.Schema({
   name: { type: String, required: true },
   address: { type: String, required: true },
+
   capabilities: { type: [String], required: true },
+  
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    unique: true,
-    index: true,
+    type: mongoose.Schema.Types.ObjectId,
+    required: true, unique: true, index: true,
   },
 
-}, { versionKey: false, timestamps: false }));
+  isOnline: { type: Boolean, required: true, default: false },
+  isDisabled: { type: Boolean, required: true, default: false },
+}, {
+  versionKey: false, timestamps: false
+});
+
+module.exports = mongoose.model('Shop', shopSchema);
