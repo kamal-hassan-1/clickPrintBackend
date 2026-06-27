@@ -4,11 +4,11 @@ const router = express.Router();
 const Shop = require('../models/Shop');
 const Price = require('../models/Price');
 
-const { resp, validateObjectId } = require('../func/misc');
+const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/{:shopId}', validateObjectId('shopId', { allowEmpty: true }), async (req, res) => {
+router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), async (req, res) => {
   if (req.params.shopId) {
     const shop = await Shop.findById(req.params.shopId).lean();
     const prices = await Price.find({ shop: req.params.shopId });
@@ -20,11 +20,25 @@ router.get('/{:shopId}', validateObjectId('shopId', { allowEmpty: true }), async
   return resp(res, 200, 'fetched shops', await Shop.find({ isDisabled: false }));
 });
 
-router.get('/:shopId/prices', validateObjectId('shopId'), async (req, res) => {
-  return resp(res, 200, 'fetched prices', await Price.find({ shop: req.params.shopId }));
+router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
+  if (!req.token.sid) return resp(res, 403, 'Forbidden');
+
+  const shopAdmin = await ShopAdmin.findOne({ user: req.token.uid, shop: req.params.shopId });
+  if (!shopAdmin) return resp(res, 403, 'You are not authorized to update this shop');
+
+  const { name, address, capabilities } = req.body || {};
+  const updates = {};
+  if (name !== undefined) updates.name = name;
+  if (address !== undefined) updates.address = address;
+  if (capabilities !== undefined) updates.capabilities = capabilities;
+
+  const shop = await Shop.findByIdAndUpdate(req.params.shopId, updates, { new: true, runValidators: true });
+  if (!shop) return resp(res, 404, 'Shop not found');
+
+  return resp(res, 200, 'Shop updated successfully', { shop });
 });
 
-router.post('/:shopId/prices', validateObjectId('shopId'), async (req, res) => {
+router.post('/:shopId/prices', validateObjectIds('shopId'), async (req, res) => {
   const { name, rate, keys } = req.body || {};
   
   if (!name || !rate || !keys) return resp(res, 400, 'missing or invalid field(s) (name, rate, keys)');
@@ -38,22 +52,12 @@ router.post('/:shopId/prices', validateObjectId('shopId'), async (req, res) => {
   return resp(res, 201, 'created price', price);
 });
 
-router.put('/:id', validateObjectId('id'), async (req, res) => {
-  if (!req.token.sid) return resp(res, 403, 'Forbidden');
+router.put('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), async (req, res) => {
+  return resp(res, 501, 'Not Implemented Yet');
+});
 
-  const shopAdmin = await ShopAdmin.findOne({ user: req.token.uid, shop: req.params.id });
-  if (!shopAdmin) return resp(res, 403, 'You are not authorized to update this shop');
-
-  const { name, address, capabilities } = req.body || {};
-  const updates = {};
-  if (name !== undefined) updates.name = name;
-  if (address !== undefined) updates.address = address;
-  if (capabilities !== undefined) updates.capabilities = capabilities;
-
-  const shop = await Shop.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
-  if (!shop) return resp(res, 404, 'Shop not found');
-
-  return resp(res, 200, 'Shop updated successfully', { shop });
+router.delete('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), async (req, res) => {
+  return resp(res, 501, 'Not Implemented Yet');
 });
 
 // -------------------------------------------------------------------------- //

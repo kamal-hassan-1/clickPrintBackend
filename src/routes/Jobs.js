@@ -7,7 +7,7 @@ const File = require('../models/File');
 const Shop = require('../models/Shop');
 
 const { sseClients } = require('../func/sse');
-const { resp, validateObjectId } = require('../func/misc');
+const { resp, validateObjectIds } = require('../func/misc');
 const { validateTransition, runSideEffects } = require('../func/jobs');
 
 // -------------------------------------------------------------------------- //
@@ -31,7 +31,7 @@ router.get('/{:jobId}', async (req, res) => {
   return resp(res, 200, 'fetched all jobs', jobs);
 });
 
-router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res, next) => {
+router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next) => {
   const { jobId } = req.params;
   const { status: nextStatus } = req.body;
   const role = (req.token.sid) ? 'shop' : 'user';

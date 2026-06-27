@@ -1,13 +1,16 @@
 info:
-  name: Get Shop By ID
+  name: Delete Price By ID
   type: http
-  seq: 2
+  seq: 6
 
 http:
-  method: GET
-  url: "{{host}}/api/shops/:shopId"
+  method: DELETE
+  url: "{{host}}/api/shops/:shopId/prices/:priceId"
   params:
     - name: shopId
+      value: ""
+      type: path
+    - name: priceId
       value: ""
       type: path
   auth: inherit

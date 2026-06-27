@@ -7,11 +7,11 @@ const Shop = require('../models/Shop');
 const Draft = require('../models/Draft');
 
 const { calculateJobCost } = require('../func/cost');
-const { resp, validateObjectId } = require('../func/misc');
+const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/{:draftId}', validateObjectId('draftId', { allowEmpty: true }), async (req, res) => {
+router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), async (req, res) => {
   if (req.params.draftId) {
     const draft = await Draft.findById(req.params.draftId).populate('createdBy', 'name number');
 
@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
   return resp(res, 201, 'draft created', draft);
 });
 
-router.patch('/:draftId', validateObjectId('draftId'), async (req, res) => {
+router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
     const draft = await Draft.findById(req.params.draftId).lean();
     
     if (!draft) return resp(res, 404, 'not found');
@@ -72,11 +72,11 @@ router.patch('/:draftId', validateObjectId('draftId'), async (req, res) => {
     return resp(res, 200, 'job created', job);
 });
 
-router.put('/:draftId', validateObjectId('draftId'), async (req, res) => {
+router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   return resp(res, 501, 'Not Implemented Yet'); // TODO
 });
 
-router.delete('/:draftId', validateObjectId('draftId'), async (req, res) => {
+router.delete('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   return resp(res, 501, 'Not Implemented Yet'); // TODO
 });
 

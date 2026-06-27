@@ -10,16 +10,28 @@ exports.resp = (res, code, message, data = {}) => {
   })
 };
 
-exports.validateObjectId = (param, options = {}) => (req, res, next) => {
-  const { allowEmpty = false } = options;
-  const value = req.params[param];
+exports.validateObjectIds = (...args) => (req, res, next) => {
+  let options = {};
+  let params = args;
 
-  if (allowEmpty && !value) {
-    return next();
+  const last = args[args.length - 1];
+  if (typeof last === 'object' && last !== null) {
+    options = last;
+    params = args.slice(0, -1);
   }
 
-  if (!mongoose.isValidObjectId(value)) {
-    return exports.resp(res, 400, 'Invalid ObjectId');
+  const { allowEmpty = false } = options;
+
+  for (const param of params) {
+    const value = req.params[param];
+
+    if (allowEmpty && !value) {
+      continue;
+    }
+
+    if (!mongoose.isValidObjectId(value)) {
+      return exports.resp(res, 400, `Invalid ObjectId for '${param}'`);
+    }
   }
 
   next();
