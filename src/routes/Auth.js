@@ -6,7 +6,6 @@ const router = express.Router();
 const Otp = require('../models/Otp');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
-const ShopAdmin = require('../models/ShopAdmin');
 
 const { resp, sendViaNotifyBot } = require('../func/misc');
 
@@ -64,14 +63,10 @@ router.post('/otp', async (req, res) => {
 });
 
 router.post('/verify', async (req, res) => {
-  const { code, actor, number } = req.body || {};
+  const { code, number } = req.body || {};
 
-  if (!code || !actor || !number) {
-    return resp(res, 400, 'missing or empty fields (code, actor, number)');
-  }
-
-  if (actor !== 'user' && actor !== 'shop') {
-    return resp(res, 400, `invalid value for field 'actor' ('shop' or 'user')`);
+  if (!code || !number) {
+    return resp(res, 400, 'missing or empty fields (code, number)');
   }
 
   const otp = await Otp.findOne({ number });
@@ -94,29 +89,20 @@ router.post('/verify', async (req, res) => {
 
   await Otp.deleteOne({ _id: otp._id });
 
-  // Resolve / create the user
   const user = await User.findOneAndUpdate(
     { number },
     { $setOnInsert: { number } },
     { upsert: true, new: true }
   );
 
-  let profile;
-  if (actor === 'user') {
-    profile = user;
-  } else {
-    // actor === 'shop': the number must be registered as a shop admin
-    const shopAdmin = await ShopAdmin.findOne({ user: user._id }).populate('shop');
-    if (!shopAdmin) return resp(res, 403, 'This number is not registered as a ClickPrint shop owner.', { errorCode: 'SHOP_NOT_REGISTERED' });
-    profile = shopAdmin.shop;
-  }
+  const shop = await Shop.findOne({ owner: user._id });
 
-  const payload = { uid: user._id, actor };
-  if (actor === 'shop') payload.shopId = profile._id;
+  const payload = { uid: user._id };
+  if (shop) payload.sid = shop._id;
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
-  return resp(res, 200, 'otp verified', { token, profile });
+  return resp(res, 200, 'otp verified', { token, profile: user, shop: shop || undefined });
 });
 
 // -------------------------------------------------------------------------- //
