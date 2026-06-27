@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
   return resp(res, 201, 'draft created', draft);
 });
 
-router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
+router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res) => {
     const draft = await Draft.findById(req.params.draftId).lean();
     
     if (!draft) return resp(res, 404, 'not found');

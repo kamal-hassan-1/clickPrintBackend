@@ -5,10 +5,10 @@ info:
 
 http:
   method: PATCH
-  url: "{{host}}/api/drafts/:id/submit"
+  url: "{{host}}/api/drafts/:draftId/submit"
   params:
-    - name: id
-      value: ""
+    - name: draftId
+      value: 6a3fc48f30912925eef84284
       type: path
   auth: inherit
 

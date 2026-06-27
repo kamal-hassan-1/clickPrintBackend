@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{host}}/api/drafts/:id"
+  url: "{{host}}/api/drafts/:draftId"
   params:
-    - name: id
-      value: 6a3e6a03aa63df7b96492992
+    - name: draftId
+      value: 6a3fc48f30912925eef84284
       type: path
   auth: inherit
 
