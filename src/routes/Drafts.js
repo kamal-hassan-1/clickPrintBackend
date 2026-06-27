@@ -10,6 +10,7 @@ const Draft = require('../models/Draft');
 
 const { calculateJobCost } = require('../func/cost');
 const { runSideEffects } = require('../func/jobs');
+const { notifyShopOnJobsUpdate } = require('../func/sse');
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -89,13 +90,16 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
             await runSideEffects('submitted', job, session);
         });
 
+        notifyShopOnJobsUpdate(job.forShop.toString());
         return resp(res, 200, 'job created', job);
-    } catch (err) {
+    }
+    catch (err) {
         if (/insufficient balance/i.test(err.message)) {
             return resp(res, 402, 'insufficient balance');
         }
         return next(err);
-    } finally {
+    }
+    finally {
         await session.endSession();
     }
 });

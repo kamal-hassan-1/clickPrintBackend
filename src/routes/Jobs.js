@@ -6,8 +6,8 @@ const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
 
-const { sseClients } = require('../func/sse');
 const { resp, validateObjectIds } = require('../func/misc');
+const { sseClients, notifyShopOnJobsUpdate } = require('../func/sse');
 const { validateTransition, runSideEffects } = require('../func/jobs');
 
 // -------------------------------------------------------------------------- //
@@ -58,9 +58,7 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
 
     await runSideEffects(nextStatus, job);
 
-    const shopId = job.forShop.toString();
-    if (sseClients.has(shopId)) sseClients.get(shopId).write(`event: jobStatusUpdate\ndata: \n\n`);
-
+    notifyShopOnJobsUpdate(job.forShop.toString());
     return resp(res, 200, 'job status updated', job);
   } catch (err) {
     next(err);

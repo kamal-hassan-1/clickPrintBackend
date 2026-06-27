@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
   sseClients.set(req.token.sid, res);
 
   // Initial hello so the client knows it's connected
-  res.write(`event: connected\ndata: ${ req.token.sid }\n\n`);
+  res.write(`event: connected\ndata: \n\n`);
 
   // Heartbeat to keep proxies from killing idle connections
   const heartbeat = setInterval(() => res.write(': keepalive\n\n'), 15000);
