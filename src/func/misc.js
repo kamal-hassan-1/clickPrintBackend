@@ -10,10 +10,18 @@ exports.resp = (res, code, message, data = {}) => {
   })
 };
 
-exports.validateObjectId = (param) => (req, res, next) => {
-  if (!mongoose.isValidObjectId(req.params[param])) {
+exports.validateObjectId = (param, options = {}) => (req, res, next) => {
+  const { allowEmpty = false } = options;
+  const value = req.params[param];
+
+  if (allowEmpty && !value) {
+    return next();
+  }
+
+  if (!mongoose.isValidObjectId(value)) {
     return exports.resp(res, 404, 'Not Found');
   }
+
   next();
 };
 
