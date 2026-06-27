@@ -13,16 +13,11 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 // -------------------------------------------------------------------------- //
 
 router.get('/{:jobId}', async (req, res) => {
-  let query = {
-    status: {
-      $in: [ 'submitted', 'queued', 'printing' ]
-    }
-  };
+  let query;
 
-  if (req.token.actor === 'shop') query.forShop = req.token.shopId;
-  else if (req.token.actor === 'user') query.createdBy = req.token.uid;
-  else return resp(res, 403, 'forbidden');
-
+  if (req.token.sid) query = { forShop: req.token.sid, status: { $in: [ 'submitted', 'queued', 'printing' ] } };
+  else query = { createdBy: req.token.uid }; 
+  
   if (req.params.jobId) {
     if (!mongoose.isValidObjectId(req.params.jobId)) return resp(res, 404, 'not found');
 
@@ -39,7 +34,7 @@ router.get('/{:jobId}', async (req, res) => {
 router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res, next) => {
   const { jobId } = req.params;
   const { status: nextStatus } = req.body;
-  const role = req.token.actor;
+  const role = (req.token.sid) ? 'shop' : 'user';
 
   if (!nextStatus) {
     return resp(res, 400, 'missing or invalid fields (status)');
@@ -49,7 +44,7 @@ router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res, next)
     const job = await Job.findById(jobId);
     if (!job) return resp(res, 404, 'not found');
 
-    if (role === 'shop' && !job.forShop.equals(req.token.shopId)) return resp(res, 403, 'forbidden');
+    if (role === 'shop' && !job.forShop.equals(req.token.sid)) return resp(res, 403, 'forbidden');
     if (role === 'user' && !job.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
     const check = validateTransition(job.status, nextStatus, role);
@@ -70,32 +65,6 @@ router.patch('/:jobId/status', validateObjectId('jobId'), async (req, res, next)
   } catch (err) {
     next(err);
   }
-});
-
-router.post('/', async (req, res) => {
-  const { files, forShop } = req.body;
-  
-  if (!Array.isArray(files) || files.length === 0) {
-    return resp(res, 400, 'missing or invalid fields (files)');
-  }
-
-  if (!forShop || !await Shop.exists({ _id: forShop })) {
-    return resp(res, 400, 'missing or invalid fields (forShop)');
-  }
-
-  for (const [index, file] of files.entries()) {
-    if (!file.hash || !await File.findOne({ fileId: file.hash })) {
-      return resp(res, 400, `missing or invalid fields (file[${index}].hash)`);
-    }
-  }
-
-  const job = await Job.create({
-    files, forShop,
-    status: 'draft',
-    createdBy: req.token.uid,
-  });
-
-  return resp(res, 201, 'new job created', job);
 });
 
 // -------------------------------------------------------------------------- //
