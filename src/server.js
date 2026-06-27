@@ -1,3 +1,4 @@
+const cors = require('cors');
 const morgan = require('morgan');
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -15,9 +16,17 @@ app.set('trust proxy', true);
 // -------------------------------------------------------------------------- //
 
 app.use(express.json());
+
 app.use(morgan('combined', {
   skip: (req, res) => req.path === '/health'
 }));
+
+app.use(cors({
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+}));
+
 
 // -------------------------------------------------------------------------- //
 

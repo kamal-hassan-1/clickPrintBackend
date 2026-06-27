@@ -11,7 +11,7 @@ const { resp, validateObjectIds } = require('../func/misc');
 router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), async (req, res) => {
   if (req.params.shopId) {
     const shop = await Shop.findById(req.params.shopId).lean();
-    const prices = await Price.find({ shop: req.params.shopId });
+    const prices = await Price.find({ shop: req.params.shopId }).sort({ rate: 1 });
 
     if (!shop) return resp(res, 404, 'not found');
     return resp(res, 200, 'fetched shop', { ...shop, prices });

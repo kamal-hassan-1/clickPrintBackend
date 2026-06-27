@@ -14,12 +14,12 @@ http:
     type: json
     data: |-
       {
-        "name": "A4-CL-DS",
-        "rate": 20,
+        "name": "A4-BW-SS",
+        "rate": 5,
         "keys": {
-          "colored": true,
+          "colored": false,
           "pageType": "A4",
-          "sidedness": true
+          "sidedness": false
         }
       }
   auth: inherit
