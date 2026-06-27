@@ -1,12 +1,15 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
 const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
+const Price = require('../models/Price');
 const Draft = require('../models/Draft');
 
 const { calculateJobCost } = require('../func/cost');
+const { runSideEffects } = require('../func/jobs');
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -42,8 +45,14 @@ router.post('/', async (req, res) => {
     }
   }
 
-  const shop = await Shop.findById(forShop);
-  const cost = calculateJobCost(files, shop.priceList);
+  const prices = await Price.find({ shop: forShop }).lean();
+
+  let cost;
+  try {
+    cost = await calculateJobCost(files, prices);
+  } catch (err) {
+    return resp(res, 400, `unable to price job (${err.message})`);
+  }
 
   const draft = await Draft.create({
     cost, files, forShop,
@@ -53,23 +62,42 @@ router.post('/', async (req, res) => {
   return resp(res, 201, 'draft created', draft);
 });
 
-router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res) => {
+router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, next) => {
     const draft = await Draft.findById(req.params.draftId).lean();
-    
+
     if (!draft) return resp(res, 404, 'not found');
     if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
-    await Draft.deleteOne({ _id: req.params.draftId });
+    const session = await mongoose.startSession();
+    try {
+        let job;
 
-    const job = await Job.create({
-        ...draft,
-        status: 'submitted',
-        statusHistory: [
-            { status: 'submitted', at: Date.now(), by: req.token.uid }
-        ]
-    });
+        // Convert the draft into a submitted job and charge the wallet as one
+        // unit of work: if deductWallet throws (e.g. insufficient funds), the
+        // job creation and draft deletion roll back together.
+        await session.withTransaction(async () => {
+            await Draft.deleteOne({ _id: req.params.draftId }, { session });
 
-    return resp(res, 200, 'job created', job);
+            [job] = await Job.create([{
+                ...draft,
+                status: 'submitted',
+                statusHistory: [
+                    { status: 'submitted', at: Date.now(), by: req.token.uid }
+                ]
+            }], { session });
+
+            await runSideEffects('submitted', job, session);
+        });
+
+        return resp(res, 200, 'job created', job);
+    } catch (err) {
+        if (/insufficient balance/i.test(err.message)) {
+            return resp(res, 402, 'insufficient balance');
+        }
+        return next(err);
+    } finally {
+        await session.endSession();
+    }
 });
 
 router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
