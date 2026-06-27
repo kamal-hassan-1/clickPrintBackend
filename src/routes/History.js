@@ -2,11 +2,18 @@ const express = require('express');
 const router = express.Router();
 
 const { resp } = require('../func/misc');
+const History = require('../models/History');
 
 // -------------------------------------------------------------------------- //
 
 router.get('/', async (req, res) => {
-  return resp(res, 501, 'Not Implemented Yet');
+  const history = await History.find(
+    (req.token.sid)
+      ? { forShop: req.token.sid }
+      : { createdBy: req.token.uid }
+  );
+
+  return resp(res, 200, 'fetched history', history);
 });
 
 // -------------------------------------------------------------------------- //
