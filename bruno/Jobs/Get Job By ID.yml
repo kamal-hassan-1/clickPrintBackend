@@ -17,3 +17,7 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  > Notes on Authorization
+  Only allows jobIds which belong to the user or the shop logged in

@@ -1,11 +1,11 @@
 info:
-  name: Submit Draft
+  name: Submit Draft As Job
   type: http
-  seq: 4
+  seq: 5
 
 http:
   method: PATCH
-  url: "{{host}}/api/drafts/:id"
+  url: "{{host}}/api/drafts/:id/submit"
   params:
     - name: id
       value: ""

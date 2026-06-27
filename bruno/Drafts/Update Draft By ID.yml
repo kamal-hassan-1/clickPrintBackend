@@ -1,14 +1,14 @@
 info:
   name: Update Draft By ID
   type: http
-  seq: 5
+  seq: 6
 
 http:
   method: PUT
   url: "{{host}}/api/drafts/:id"
   params:
     - name: id
-      value: ""
+      value: 6a3e6a03aa63df7b96492992
       type: path
   auth: inherit
 
