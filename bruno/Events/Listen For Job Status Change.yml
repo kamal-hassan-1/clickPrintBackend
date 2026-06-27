@@ -1,5 +1,5 @@
 info:
-  name: Event Stream
+  name: Listen For Job Status Change
   type: http
   seq: 6
 

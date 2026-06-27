@@ -22,9 +22,7 @@ router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), asyn
 
 router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
   if (!req.token.sid) return resp(res, 403, 'Forbidden');
-
-  const shopAdmin = await ShopAdmin.findOne({ user: req.token.uid, shop: req.params.shopId });
-  if (!shopAdmin) return resp(res, 403, 'You are not authorized to update this shop');
+  if (req.token.sid !== req.params.shopId) return resp(res, 403, 'Forbidden');
 
   const { name, address, capabilities } = req.body || {};
   const updates = {};
