@@ -1,11 +1,11 @@
 info:
-  name: Create New Job
+  name: Create New Draft
   type: http
-  seq: 2
+  seq: 3
 
 http:
   method: POST
-  url: "{{host}}/api/jobs"
+  url: "{{host}}/api/drafts"
   body:
     type: json
     data: |-
@@ -13,7 +13,7 @@ http:
         "forShop": "6a3cded8705669a8f5981125",
         "files": [
           {
-            "hash": "b05bebd85697bd1ddd4c019d227530d6",
+            "fileId": "b05bebd85697bd1ddd4c019d227530d6",
             "settings": {
               "pageType": "A4",
               "color": true,
@@ -25,7 +25,7 @@ http:
             }
           },
           {
-            "hash": "761a2620ed6b1820151b63a1d06577ff",
+            "fileId": "761a2620ed6b1820151b63a1d06577ff",
             "settings": {
               "pageType": "A4",
               "color": true,

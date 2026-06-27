@@ -4,3 +4,5 @@ variables:
     value: http://localhost:3000
   - secret: true
     name: token
+  - name: number
+    value: "923235400291"

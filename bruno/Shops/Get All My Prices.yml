@@ -1,14 +1,14 @@
 info:
-  name: Get Job By ID
+  name: Get All My Prices
   type: http
   seq: 1
 
 http:
   method: GET
-  url: "{{host}}/api/jobs/:jobId"
+  url: "{{host}}/api/shops/:id/prices"
   params:
-    - name: jobId
-      value: 6a0454964a38bda31db26e4a
+    - name: id
+      value: ""
       type: path
   auth: inherit
 

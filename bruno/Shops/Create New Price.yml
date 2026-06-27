@@ -1,0 +1,31 @@
+info:
+  name: Create New Price
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{host}}/api/shops/:id/prices"
+  params:
+    - name: id
+      value: 6a3cded8705669a8f5981125
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Colored A4 Page Single Sided",
+        "rate": 20,
+        "keys": {
+          "colored": true,
+          "pageType": "A4",
+          "sidedness": false
+        }
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

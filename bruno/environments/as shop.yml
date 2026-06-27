@@ -1,6 +1,6 @@
-name: prod
+name: as shop
 variables:
   - name: host
-    value: https://clickprintbackend.wckd.pk
+    value: http://localhost:3000
   - secret: true
     name: token

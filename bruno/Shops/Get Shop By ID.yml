@@ -1,23 +1,15 @@
 info:
-  name: Update Shop
+  name: Get Shop By ID
   type: http
-  seq: 3
+  seq: 2
 
 http:
-  method: PUT
+  method: GET
   url: "{{host}}/api/shops/:id"
   params:
     - name: id
       value: 6a3cded8705669a8f5981125
       type: path
-  body:
-    type: json
-    data: |-
-      {
-        "name": "Ahad Print Shop",
-        "address": "Westridge 3, Rawalpindi",
-        "capabilities": ["bw", "a4"]
-      }
   auth: inherit
 
 settings:
