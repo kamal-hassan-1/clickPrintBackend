@@ -53,46 +53,24 @@ router.post('/', async (req, res) => {
   return resp(res, 201, 'draft created', draft);
 });
 
-// router.patch('/:draftId', validateObjectId('draftId'), async (req, res) => {
-//     const draft = await Draft.findById(req.params.draftId).lean();
+router.patch('/:draftId', validateObjectId('draftId'), async (req, res) => {
+    const draft = await Draft.findById(req.params.draftId).lean();
     
-//     if (!draft) return resp(res, 404, 'not found');
-//     if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
+    if (!draft) return resp(res, 404, 'not found');
+    if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
-//     let job;
-//     const session = await mongoose.startSession();
+    await Draft.deleteOne({ _id: req.params.draftId });
 
-//     try {
-//         await session.withTransaction(async () => {
-//             await Draft.deleteOne({ _id: req.params.draftId }, { session });
+    const job = await Job.create({
+        ...draft,
+        status: 'submitted',
+        statusHistory: [
+            { status: 'submitted', at: Date.now(), by: req.token.uid }
+        ]
+    });
 
-//             [job] = await Job.create([{
-//                 ...draftData,
-//                 status: 'submitted',
-//                 statusHistory: [
-//                     { status: 'submitted', at: Date.now(), by: req.token.uid }
-//                 ]
-//             }], { session });
-//         });
-
-//     return resp(res, 200, 'job created', job);
-// } finally {
-//     session.endSession(); // always runs, even if error is thrown
-// }
-
-//     await Draft.deleteOne({ _id: req.params.draftId });
-
-//     const job = await Job.create({
-//         ...draft,
-//         status: 'submitted',
-//         statusHistory: [
-//             { status: 'submitted', at: Date.now(), by: req.token.uid }
-//         ]
-//     });
-
-
-//     return resp(res, 200, 'job created', job);
-// });
+    return resp(res, 200, 'job created', job);
+});
 
 router.put('/:draftId', validateObjectId('draftId'), async (req, res) => {
   return resp(res, 501, 'Not Implemented Yet'); // TODO
