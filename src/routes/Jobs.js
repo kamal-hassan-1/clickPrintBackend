@@ -12,22 +12,24 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/{:jobId}', async (req, res) => {
-  let query;
+router.get('/{:jobId}', validateObjectIds('jobId', { allowEmpty: true }), async (req, res) => {
+  let query = (req.token.sid) ? { forShop: req.token.sid } : { createdBy: req.token.uid };
 
-  if (req.token.sid) query = { forShop: req.token.sid, status: { $in: [ 'submitted', 'queued', 'printing' ] } };
-  else query = { createdBy: req.token.uid }; 
-  
   if (req.params.jobId) {
-    if (!mongoose.isValidObjectId(req.params.jobId)) return resp(res, 404, 'not found');
+    const job = await Job
+      .findOne({ _id: req.params.jobId, ...query })
+      .populate('createdBy', 'name number')
+      .sort({ createdAt: 1 });
 
-    const job = await Job.findOne({ _id: req.params.jobId, ...query }).populate('createdBy', 'name number');
     if (!job) return resp(res, 404, 'not found');
-
     return resp(res, 200, 'fetched job', job);
   }
 
-  const jobs = await Job.find(query).populate('createdBy', 'name number');
+  const jobs = await Job
+    .find(query)
+    .populate('createdBy', 'name number')
+    .sort({ createdAt: 1 });
+
   return resp(res, 200, 'fetched all jobs', jobs);
 });
 
@@ -57,9 +59,7 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
     await runSideEffects(nextStatus, job);
 
     const shopId = job.forShop.toString();
-    if (sseClients.has(shopId)) {
-      sseClients.get(shopId).write(`event: jobStatusUpdate\ndata: ${JSON.stringify({ jobId, status: nextStatus })}\n\n`);
-    }
+    if (sseClients.has(shopId)) sseClients.get(shopId).write(`event: jobStatusUpdate\ndata: \n\n`);
 
     return resp(res, 200, 'job status updated', job);
   } catch (err) {
