@@ -13,7 +13,7 @@ const settingsSchema = new mongoose.Schema({
 });
 
 const fileSchema = new mongoose.Schema({
-  hash: { type: String, required: true },
+  fileId: { type: String, required: true },
   settings: { type: settingsSchema, required: true },
 }, {
   _id: false, versionKey: false, timestamps: false,

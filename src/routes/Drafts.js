@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
+const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
 const Draft = require('../models/Draft');
 
-const { resp, validateObjectId } = require('../func/misc');
-const Job = require('../models/Job');
 const { calculateJobCost } = require('../func/cost');
+const { resp, validateObjectId } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
@@ -93,6 +93,14 @@ router.post('/', async (req, res) => {
 
 //     return resp(res, 200, 'job created', job);
 // });
+
+router.put('/:draftId', validateObjectId('draftId'), async (req, res) => {
+  return resp(res, 501, 'Not Implemented Yet'); // TODO
+});
+
+router.delete('/:draftId', validateObjectId('draftId'), async (req, res) => {
+  return resp(res, 501, 'Not Implemented Yet'); // TODO
+});
 
 // -------------------------------------------------------------------------- //
 

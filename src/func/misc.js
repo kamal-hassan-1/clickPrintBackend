@@ -19,7 +19,7 @@ exports.validateObjectId = (param, options = {}) => (req, res, next) => {
   }
 
   if (!mongoose.isValidObjectId(value)) {
-    return exports.resp(res, 404, 'Not Found');
+    return exports.resp(res, 400, 'Invalid ObjectId');
   }
 
   next();
