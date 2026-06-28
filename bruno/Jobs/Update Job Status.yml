@@ -8,13 +8,13 @@ http:
   url: "{{host}}/api/jobs/:jobId/status"
   params:
     - name: jobId
-      value: 6a400efc2adf460ac394fd11
+      value: 6a40120b4f48dab8a0ee0ddb
       type: path
   body:
     type: json
     data: |-
       {
-        "status": "failed"
+        "status": "completed"
       }
   auth: inherit
 
