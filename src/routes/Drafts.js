@@ -105,11 +105,53 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
 });
 
 router.put('/:draftId', validateObjectIds('draftId'), async (req, res) => {
-  return resp(res, 501, 'Not Implemented Yet'); // TODO
+  const draft = await Draft.findById(req.params.draftId);
+
+  if (!draft) return resp(res, 404, 'not found');
+  if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
+
+  const { files, forShop } = req.body;
+
+  if (!Array.isArray(files) || files.length === 0) {
+    return resp(res, 400, 'missing or invalid fields (files)');
+  }
+
+  if (!forShop || !await Shop.exists({ _id: forShop })) {
+    return resp(res, 400, 'missing or invalid fields (forShop)');
+  }
+
+  for (const [index, file] of files.entries()) {
+    if (!file.fileId || !await File.findOne({ fileId: file.fileId })) {
+      return resp(res, 400, `missing or invalid fields (file[${index}].fileId)`);
+    }
+  }
+
+  const prices = await Price.find({ shop: forShop }).lean();
+
+  let cost;
+  try {
+    cost = await calculateJobCost(files, prices);
+  } catch (err) {
+    return resp(res, 400, `unable to price job (${err.message})`);
+  }
+
+  draft.cost = cost;
+  draft.files = files;
+  draft.forShop = forShop;
+  await draft.save();
+
+  return resp(res, 200, 'draft updated', draft);
 });
 
 router.delete('/:draftId', validateObjectIds('draftId'), async (req, res) => {
-  return resp(res, 501, 'Not Implemented Yet'); // TODO
+  const draft = await Draft.findById(req.params.draftId).lean();
+
+  if (!draft) return resp(res, 404, 'not found');
+  if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
+
+  await Draft.deleteOne({ _id: req.params.draftId });
+
+  return resp(res, 200, 'draft deleted');
 });
 
 // -------------------------------------------------------------------------- //
