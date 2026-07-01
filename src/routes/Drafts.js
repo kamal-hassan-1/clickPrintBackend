@@ -58,8 +58,9 @@ router.post('/', async (req, res) => {
   const draft = await Draft.create({
     cost, files, forShop,
     createdBy: req.token.uid,
-  }).populate('forShop');
-
+  })
+  await draft.populate('forShop');
+  
   return resp(res, 201, 'draft created', draft);
 });
 
