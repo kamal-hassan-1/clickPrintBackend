@@ -22,7 +22,9 @@ router.get('/', async (req, res) => {
   res.write(`event: connected\ndata: \n\n`);
 
   // Heartbeat to keep proxies from killing idle connections
-  const heartbeat = setInterval(() => res.write(': keepalive\n\n'), 15000);
+  const heartbeat = setInterval(() => {
+    res.write('event: ping\ndata: \n\n')
+  }, 15000);
 
   req.on('close', () => {
     clearInterval(heartbeat);

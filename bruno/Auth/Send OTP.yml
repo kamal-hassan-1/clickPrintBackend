@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "number": "923235400291",
-        "actor" : "user"
+        "actor" : "user",
+        "number": "923235400291"
       }
 
 runtime:
