@@ -1,0 +1,19 @@
+info:
+  name: Mark Shop As Online
+  type: http
+  seq: 7
+
+http:
+  method: PATCH
+  url: "{{host}}/api/shops/:shopId/isOnline"
+  params:
+    - name: shopId
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

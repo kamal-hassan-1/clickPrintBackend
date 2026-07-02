@@ -78,6 +78,20 @@ router.delete('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId')
   return resp(res, 200, 'deleted price');
 });
 
+router.patch('/:shopId/isOnline', validateObjectIds('shopId'), async (req, res) => {
+  if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
+
+  const shop = await Shop.findByIdAndUpdate(
+    req.params.shopId,
+    { isOnline: true, lastSeen: new Date() },
+    { new: true }
+  );
+
+  if (!shop) return resp(res, 404, 'not found');
+
+  return resp(res, 200, 'isOnline updated', { shop });
+});
+
 // -------------------------------------------------------------------------- //
 
 module.exports = router;

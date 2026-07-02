@@ -1,13 +1,27 @@
 const express = require('express');
 const router = express.Router();
 
+const Shop = require('../models/Shop');
+
 const { resp } = require('../func/misc');
 const { sseClients } = require('../func/sse');
+
+async function checkOnlineOutcome(shopId) {
+  const shop = await Shop.findById(shopId);
+  if (!shop) return;
+
+  if (shop.lastSeen < (Date.now() - 30000)) {
+    shop.isOnline = false;
+  }
+
+  await shop.save();
+};
 
 // -------------------------------------------------------------------------- //
 
 router.get('/', async (req, res) => {
-  if (!req.token.sid) return resp(res, 403, 'Forbidden');
+  if (!req.token.sid) return resp(res, 403, 'forbidden');
+  sseClients.set(req.token.sid, res);
 
   res.set({
     'Connection': 'keep-alive',
@@ -16,18 +30,16 @@ router.get('/', async (req, res) => {
   });
 
   res.flushHeaders();
-  sseClients.set(req.token.sid, res);
-
-  // Initial hello so the client knows it's connected
   res.write(`event: connected\ndata: \n\n`);
 
-  // Heartbeat to keep proxies from killing idle connections
-  const heartbeat = setInterval(() => {
-    res.write('event: ping\ndata: \n\n')
+  const ping = setInterval(() => {
+    checkOnlineOutcome();
+    res.write('event: ping\ndata: \n\n');
   }, 15000);
 
   req.on('close', () => {
-    clearInterval(heartbeat);
+    clearInterval(ping);
+    checkOnlineOutcome();
     sseClients.delete(req.token.sid);
   });
 });
