@@ -12,6 +12,7 @@ const shopSchema = new mongoose.Schema({
     required: true, unique: true, index: true,
   },
 
+  lastSeen: { type: Date, required: true, default: new Date(0) },
   isOnline: { type: Boolean, required: true, default: false },
   isDisabled: { type: Boolean, required: true, default: false },
 }, {
