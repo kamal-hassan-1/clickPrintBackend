@@ -1,14 +1,14 @@
 info:
   name: Get Draft
   type: http
-  seq: 4
+  seq: 2
 
 http:
   method: GET
   url: "{{host}}/api/drafts/:draftId"
   params:
     - name: draftId
-      value: 6a3fc48f30912925eef84284
+      value: 6a480aa4e0888726b98d6e92
       type: path
   auth: inherit
 

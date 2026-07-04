@@ -36,13 +36,13 @@ services:
       ME_CONFIG_BASICAUTH: false
       ME_CONFIG_MONGODB_URL: mongodb://mongo
 
-  notifybot:
-    image: ghcr.io/ahad19n/notifybot
-    restart: unless-stopped
-    volumes:
-      - notifybot:/data
-    environment:
-      API_KEY: thisisabadapikeythisisabadapikey
+  # notifybot:
+  #   image: ghcr.io/ahad19n/notifybot
+  #   restart: unless-stopped
+  #   volumes:
+  #     - notifybot:/data
+  #   environment:
+  #     API_KEY: thisisabadapikeythisisabadapikey
 
   gotenberg:
     image: gotenberg/gotenberg:8
@@ -63,4 +63,5 @@ services:
       GOTENBERG_URL: http://gotenberg:3000
       JWT_SECRET: thisisabadsecretthisisabadsecret
       MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
-      NOTIFYBOT_URL: http://notifybot:3000/send?apiKey=thisisabadapikeythisisabadapikey
+      # NOTIFYBOT_URL: http://notifybot:3000/send?apiKey=thisisabadapikeythisisabadapikey
+      NOTIFYBOT_URL: ${NOTIFYBOT_URL}

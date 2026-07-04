@@ -10,30 +10,18 @@ http:
     type: json
     data: |-
       {
-        "forShop": "6a3cded8705669a8f5981125",
-        "files": [
+        "shop": "6a3cded8705669a8f5981129",
+        "docs": [
           {
-            "fileId": "c585e8e7c04bdd936267431461c878f0",
+            "file": "6a3fc2291d4bcb71ce1f27c3",
             "settings": {
-              "pageType": "A4",
               "color": true,
-              "pageSelection": "1,3,16-20,25",
-              "orientation": "landscape",
-              "pagesPerSheet": 2,
-              "numberOfCopies": 5,
-              "sidedness": "long"
-            }
-          },
-          {
-            "fileId": "8204b8e14903a26bf28a475b51a8178c",
-            "settings": {
               "pageType": "A4",
-              "color": true,
-              "pageSelection": "1,3,16-20,25",
-              "orientation": "landscape",
               "pagesPerSheet": 2,
-              "numberOfCopies": 5,
-              "sidedness": "single"
+              "numberOfCopies": 3,
+              "sidedness": "none",
+              "pageSelection": "",
+              "orientation": "landscape"
             }
           }
         ]
