@@ -215,6 +215,8 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
     });
 
     notifyShopOnJobsUpdate(job.shop.toString());
+
+    await job.populate(Job.jobPopulate);
     return resp(res, 200, 'job created', {job});
   }
 
