@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
   });
 
   await draft.populate(Draft.draftPopulate);
-  return resp(res, 201, 'draft created', draft);
+  return resp(res, 201, 'draft created', { draft });
 });
 
 router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), async (req, res) => {
@@ -55,11 +55,11 @@ router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), as
     if (!draft) return resp(res, 404, 'not found');
     if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
-    return resp(res, 200, 'fetched draft', draft);
+    return resp(res, 200, 'fetched draft', {draft});
   }
 
   const drafts = await Draft.find({ createdBy: req.token.uid }).populate(Draft.draftPopulate);
-  return resp(res, 200, 'fetched all drafts', drafts);
+  return resp(res, 200, 'fetched all drafts', {drafts});
 });
 
 router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
@@ -105,7 +105,7 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   await draft.save();
   await draft.populate(Draft.draftPopulate);
 
-  return resp(res, 200, 'draft updated', draft);
+  return resp(res, 200, 'draft updated', {draft});
 });
 
 router.delete('/:draftId', validateObjectIds('draftId'), async (req, res) => {
@@ -154,7 +154,7 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
   }
 
   await draft.save();
-  return resp(res, 200, 'draft checked', draft);
+  return resp(res, 200, 'draft checked', {draft});
 });
 
 router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, next) => {
@@ -181,7 +181,7 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
     });
 
     notifyShopOnJobsUpdate(job.shop.toString());
-    return resp(res, 200, 'job created', job);
+    return resp(res, 200, 'job created', {job});
   }
 
   catch (err) {

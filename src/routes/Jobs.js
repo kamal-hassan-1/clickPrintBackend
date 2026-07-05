@@ -21,7 +21,7 @@ router.get('/{:jobId}', validateObjectIds('jobId', { allowEmpty: true }), async 
       .populate(Job.jobPopulate);
 
     if (!job) return resp(res, 404, 'not found');
-    return resp(res, 200, 'fetched job', job);
+    return resp(res, 200, 'fetched job', {job});
   }
 
   const jobs = await Job
@@ -29,7 +29,7 @@ router.get('/{:jobId}', validateObjectIds('jobId', { allowEmpty: true }), async 
     .populate(Job.jobPopulate)
     .sort({ createdAt: 1 });
 
-  return resp(res, 200, 'fetched all jobs', jobs);
+  return resp(res, 200, 'fetched all jobs', {jobs});
 });
 
 router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next) => {
@@ -60,7 +60,7 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
     notifyShopOnJobsUpdate(job.shop.toString());
 
     await job.populate(Job.jobPopulate);
-    return resp(res, 200, 'job status updated', job);
+    return resp(res, 200, 'job status updated', {job});
   }
   
   catch (err) {

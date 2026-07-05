@@ -8,11 +8,14 @@ http:
   url: "{{host}}/api/drafts/:draftId"
   params:
     - name: draftId
-      value: 6a480ba3959505a279dcb95f
+      value: 6a4a0fe8f36cd944151088ee
       type: path
   body:
     type: json
-    data: ""
+    data: |-
+      {
+        "shop": "6a3cded8705669a8f5981125"
+      }
   auth: inherit
 
 settings:

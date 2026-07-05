@@ -8,36 +8,7 @@ http:
   url: "{{host}}/api/drafts"
   body:
     type: json
-    data: |-
-      {
-        "shop": "6a3cded8705669a8f5981125",
-        "files": [
-          {
-            "file": "6a49f60e46720f525e003562",
-            "settings": {
-              "color": true,
-              "pageType": "A4",
-              "pagesPerSheet": 1,
-              "numberOfCopies": 1,
-              "sidedness": "none",
-              "pageSelection": "",
-              "orientation": "portrait"
-            }
-          },
-          {
-            "file": "6a49f61d46720f525e003563",
-            "settings": {
-              "color": false,
-              "pageType": "A4",
-              "pagesPerSheet": 1,
-              "numberOfCopies": 1,
-              "sidedness": "none",
-              "pageSelection": "",
-              "orientation": "portrait"
-            }
-          }
-        ]
-      }
+    data: ""
   auth: inherit
 
 settings:

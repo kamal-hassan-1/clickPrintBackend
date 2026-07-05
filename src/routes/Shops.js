@@ -14,10 +14,10 @@ router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), asyn
     const prices = await Price.find({ shop: req.params.shopId }).sort({ rate: 1 });
 
     if (!shop) return resp(res, 404, 'not found');
-    return resp(res, 200, 'fetched shop', { ...shop, prices });
+    return resp(res, 200, 'fetched shop', { shop: {...shop, prices} });
   }
 
-  return resp(res, 200, 'fetched shops', await Shop.find({ isDisabled: false }));
+  return resp(res, 200, 'fetched shops', { shops: await Shop.find({ isDisabled: false }) });
 });
 
 router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
@@ -47,7 +47,7 @@ router.post('/:shopId/prices', validateObjectIds('shopId'), async (req, res) => 
     shop: req.token.sid,
   });
 
-  return resp(res, 201, 'created price', price);
+  return resp(res, 201, 'created price', {price});
 });
 
 router.put('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), async (req, res) => {
@@ -66,7 +66,7 @@ router.put('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), a
   );
 
   if (!price) return resp(res, 404, 'not found');
-  return resp(res, 200, 'updated price', price);
+  return resp(res, 200, 'updated price', {price});
 });
 
 router.delete('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), async (req, res) => {
