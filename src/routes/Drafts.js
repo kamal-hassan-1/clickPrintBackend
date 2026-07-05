@@ -16,13 +16,13 @@ const { resp, validateObjectIds } = require('../func/misc');
 const draftPopulate = [
   { path: 'shop', select: 'name' },
   { path: 'createdBy', select: 'name number' },
-  { path: 'docs.file', select: 'originalName numberOfPages' }
+  { path: 'files.file', select: 'originalName numberOfPages' }
 ];
 
 // -------------------------------------------------------------------------- //
 
 router.post('/', async (req, res) => {
-  const { docs, shop } = req.body || {};
+  const { files, shop } = req.body || {};
 
   // TODO: validateObjectIds shop
   
@@ -30,22 +30,22 @@ router.post('/', async (req, res) => {
     return resp(res, 400, 'shop does not exist');
   }
 
-  if (docs) {
-    if (!Array.isArray(docs) || docs.length === 0) {
-      return resp(res, 400, 'docs must be an array of 1 or more objects');
+  if (files) {
+    if (!Array.isArray(files) || files.length === 0) {
+      return resp(res, 400, 'files must be an array of 1 or more objects');
     }
 
-    for (const [index, doc] of docs.entries()) {
-      // TODO: validateObjectIds doc.file
+    for (const [index, file] of files.entries()) {
+      // TODO: validateObjectIds file.file
 
-      if (!doc.file || !await File.exists({ _id: doc.file })) {
+      if (!file.file || !await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
       }
     }
   }
 
   const draft = await Draft.create({
-    docs, shop,
+    files, shop,
     createdBy: req.token.uid,
   });
 
@@ -69,7 +69,7 @@ router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), as
 });
 
 router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
-  const { docs, shop } = req.body || {};
+  const { files, shop } = req.body || {};
 
   // TODO: validateObjectIds shop
 
@@ -90,20 +90,20 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
     draft.shop = shop;
   }
 
-  if (docs !== undefined) {
-    if (!Array.isArray(docs)) {
-      return resp(res, 400, 'docs must be an array');
+  if (files !== undefined) {
+    if (!Array.isArray(files)) {
+      return resp(res, 400, 'files must be an array');
     }
 
-    for (const doc of docs) {
-      // TODO: validateObjectIds doc.file
+    for (const file of files) {
+      // TODO: validateObjectIds file.file
 
-      if (!doc.file || !await File.exists({ _id: doc.file })) {
+      if (!file.file || !await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
       }
     }
 
-    draft.docs = docs;
+    draft.files = files;
   }
 
   delete draft.cost;
@@ -136,23 +136,23 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
     return resp(res, 400, 'draft is missing shop');
   }
 
-  if (!Array.isArray(draft.docs) || draft.docs.length === 0) {
-    return resp(res, 400, 'draft has no docs');
+  if (!Array.isArray(draft.files) || draft.files.length === 0) {
+    return resp(res, 400, 'draft has no files');
   }
 
-  for (const [index, doc] of draft.docs.entries()) {
-    if (!doc.file) {
-      return resp(res, 400, `docs[${index}] is missing file`);
+  for (const [index, file] of draft.files.entries()) {
+    if (!file.file) {
+      return resp(res, 400, `files[${index}] is missing file`);
     }
-    if (!doc.settings) {
-      return resp(res, 400, `docs[${index}] is missing settings`);
+    if (!file.settings) {
+      return resp(res, 400, `files[${index}] is missing settings`);
     }
   }
 
   const prices = await Price.find({ shop: draft.shop }).lean();
 
   try {
-    draft.cost = await calculateJobCost(draft.docs, prices);
+    draft.cost = await calculateJobCost(draft.files, prices);
   }
   catch (err) {
     return resp(res, 400, `unable to price job (${err.message})`);

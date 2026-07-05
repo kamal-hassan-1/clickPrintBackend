@@ -39,7 +39,7 @@ const settingsSchema = new mongoose.Schema({
   versionKey: false,
 });
 
-const docSchema = new mongoose.Schema({
+const fileSchema = new mongoose.Schema({
   file: {
     ref: 'File',
     required: true,
@@ -75,9 +75,9 @@ const costSchema = new mongoose.Schema({
 });
 
 const draftSchema = new mongoose.Schema({
-  docs: {
+  files: {
     required: false,
-    type: [ docSchema ],
+    type: [ fileSchema ],
   },
   cost: {
     required: false,
