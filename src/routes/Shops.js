@@ -4,6 +4,7 @@ const router = express.Router();
 const Shop = require('../models/Shop');
 const Price = require('../models/Price');
 
+const { sseClients } = require('../func/sse');
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -80,6 +81,7 @@ router.delete('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId')
 
 router.patch('/:shopId/isOnline', validateObjectIds('shopId'), async (req, res) => {
   if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
+  if (!sseClients.get(req.token.sid)) return resp(res, 400, 'shop must be connected to sse to update');
 
   const shop = await Shop.findByIdAndUpdate(
     req.params.shopId,
@@ -88,7 +90,6 @@ router.patch('/:shopId/isOnline', validateObjectIds('shopId'), async (req, res) 
   );
 
   if (!shop) return resp(res, 404, 'not found');
-
   return resp(res, 200, 'isOnline updated', { shop });
 });
 

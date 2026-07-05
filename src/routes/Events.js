@@ -1,26 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
-const Shop = require('../models/Shop');
-
 const { resp } = require('../func/misc');
 const { sseClients } = require('../func/sse');
 
-async function checkOnlineOutcome(shopId) {
-  const shop = await Shop.findById(shopId);
-  if (!shop) return;
-
-  if (shop.lastSeen < (Date.now() - 30000)) {
-    shop.isOnline = false;
-  }
-
-  await shop.save();
-};
+const Shop = require('../models/Shop');
+(async () => await Shop.updateMany({}, { $set: { isOnline: false } }))();
 
 // -------------------------------------------------------------------------- //
 
 router.get('/', async (req, res) => {
   if (!req.token.sid) return resp(res, 403, 'forbidden');
+
   sseClients.set(req.token.sid, res);
 
   res.set({
@@ -32,15 +23,21 @@ router.get('/', async (req, res) => {
   res.flushHeaders();
   res.write(`event: connected\ndata: \n\n`);
 
-  const ping = setInterval(() => {
-    checkOnlineOutcome();
-    res.write('event: ping\ndata: \n\n');
-  }, 15000);
+  const ping = setInterval(async () => {
+    const shop = await Shop.findById(shopId);
 
-  req.on('close', () => {
+    if (shop.lastSeen < (Date.now() - 10000)) {
+      shop.isOnline = false;
+      await shop.save();
+    };
+
+    res.write('event: ping\ndata: \n\n');
+  }, 5000);
+
+  req.on('close', async () => {
     clearInterval(ping);
-    checkOnlineOutcome();
     sseClients.delete(req.token.sid);
+    await Shop.findByIdAndUpdate(req.token.sid, { isOnline: false });
   });
 });
 
