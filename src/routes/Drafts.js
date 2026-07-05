@@ -149,18 +149,17 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
     }
   }
 
+  await draft.populate(draftPopulate);
   const prices = await Price.find({ shop: draft.shop }).lean();
 
-  try {
-    draft.cost = await calculateJobCost(draft.files, prices);
-  }
-  catch (err) {
-    return resp(res, 400, `unable to price job (${err.message})`);
-  }
+  // try {
+  //   draft.cost = await calculateJobCost(draft.files, prices);
+  // }
+  // catch (err) {
+  //   return resp(res, 400, `unable to price job (${err.message})`);
+  // }
 
   await draft.save();
-  await draft.populate(draftPopulate);
-
   return resp(res, 200, 'draft checked', draft);
 });
 

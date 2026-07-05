@@ -1,30 +1,20 @@
 volumes:
   mongo:
-  notifybot:
 
 services:
-  cloudflared:
-    image: cloudflare/cloudflared
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-  
   mongo:
     image: mongo
     restart: unless-stopped
-    # Run as a single-node replica set so multi-document transactions work.
-    command: ["--replSet", "rs0", "--bind_ip_all"]
-    ports:
-      - 27017:27017
     volumes:
       - mongo:/data/db
-    # Initialize the replica set on first boot; a no-op once it already exists.
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     healthcheck:
       test: >
         mongosh --quiet --eval "try { rs.status().ok } catch (e) {
         rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongo:27017' }] }).ok }"
-      interval: 10s
-      timeout: 10s
       retries: 10
+      timeout: 10s
+      interval: 10s
       start_period: 20s
 
   mongo-express:
@@ -35,14 +25,6 @@ services:
     environment:
       ME_CONFIG_BASICAUTH: false
       ME_CONFIG_MONGODB_URL: mongodb://mongo
-
-  # notifybot:
-  #   image: ghcr.io/ahad19n/notifybot
-  #   restart: unless-stopped
-  #   volumes:
-  #     - notifybot:/data
-  #   environment:
-  #     API_KEY: thisisabadapikeythisisabadapikey
 
   gotenberg:
     image: gotenberg/gotenberg:8
@@ -59,9 +41,8 @@ services:
     volumes:
       - ./files:/app/files
     environment:
+      NOTIFYBOT_URL: ${NOTIFYBOT_URL}
       INTERNAL_URL: http://backend:3000
       GOTENBERG_URL: http://gotenberg:3000
       JWT_SECRET: thisisabadsecretthisisabadsecret
       MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
-      # NOTIFYBOT_URL: http://notifybot:3000/send?apiKey=thisisabadapikeythisisabadapikey
-      NOTIFYBOT_URL: ${NOTIFYBOT_URL}

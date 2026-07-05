@@ -12,8 +12,8 @@ http:
       - name: file
         type: file
         value:
-          - /home/ahad/Pictures/Screenshots/Screenshot From 2026-06-24 18-07-15.png
-        contentType: image/png
+          - /home/ahad/Downloads/ntn wecode.pdf
+        contentType: application/pdf
   auth: inherit
 
 settings:

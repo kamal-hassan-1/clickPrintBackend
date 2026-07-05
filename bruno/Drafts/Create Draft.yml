@@ -10,18 +10,30 @@ http:
     type: json
     data: |-
       {
-        "shop": "6a3cded8705669a8f5981129",
-        "docs": [
+        "shop": "6a3cded8705669a8f5981125",
+        "files": [
           {
-            "file": "6a3fc2291d4bcb71ce1f27c3",
+            "file": "6a49f60e46720f525e003562",
             "settings": {
               "color": true,
               "pageType": "A4",
-              "pagesPerSheet": 2,
-              "numberOfCopies": 3,
+              "pagesPerSheet": 1,
+              "numberOfCopies": 1,
               "sidedness": "none",
               "pageSelection": "",
-              "orientation": "landscape"
+              "orientation": "portrait"
+            }
+          },
+          {
+            "file": "6a49f61d46720f525e003563",
+            "settings": {
+              "color": false,
+              "pageType": "A4",
+              "pagesPerSheet": 1,
+              "numberOfCopies": 1,
+              "sidedness": "none",
+              "pageSelection": "",
+              "orientation": "portrait"
             }
           }
         ]
