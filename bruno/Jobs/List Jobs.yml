@@ -1,5 +1,5 @@
 info:
-  name: Get All My Jobs
+  name: List Jobs
   type: http
   seq: 2
 

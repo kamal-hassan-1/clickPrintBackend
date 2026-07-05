@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+// TODO: add validations
+
 const fileSchema = new mongoose.Schema({
   originalName: {
     type: String,
@@ -24,4 +26,10 @@ const fileSchema = new mongoose.Schema({
   versionKey: false,
 });
 
-module.exports = mongoose.model('File', fileSchema);
+const File = mongoose.model('File', fileSchema);
+
+File.filePopulate = [
+  { path: 'uploadedBy', select: 'name number' },
+];
+
+module.exports = File;

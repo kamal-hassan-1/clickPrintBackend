@@ -1,11 +1,36 @@
 const mongoose = require('mongoose');
 
-module.exports = mongoose.model('Otp', new mongoose.Schema({
+// TODO: add validations
 
-  code: { type: String, required: true },
-  tries: { type: Number, required: true },
-  expiry: { type: Date, required: true, index: { expires: 0 } },
-  lastSentAt: { type: Date, required: true },
-  number: { type: String, required: true, unique: true, index: true },
+const otpSchema = new mongoose.Schema({
+  code: {
+    type: String,
+    required: true,
+  },
+  tries: {
+    type: Number,
+    required: true,
+  },
+  lastSentAt: {
+    type: Date,
+    required: true,
+  },
+  expiry: {
+    type: Date,
+    required: true,
+    index: { expires: 0 },
+  },
+  number: {
+    index: true,
+    unique: true,
+    type: String,
+    required: true,
+  },
+}, {
+  timestamps: false,
+  versionKey: false,
+});
 
-}, { versionKey: false, timestamps: false }));
+const Otp = mongoose.model('Otp', otpSchema);
+
+module.exports = Otp;

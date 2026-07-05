@@ -13,12 +13,6 @@ const { calculateJobCost } = require('../func/cost');
 const { notifyShopOnJobsUpdate } = require('../func/sse');
 const { resp, validateObjectIds } = require('../func/misc');
 
-const draftPopulate = [
-  { path: 'shop', select: 'name' },
-  { path: 'createdBy', select: 'name number' },
-  { path: 'files.file', select: 'originalName numberOfPages' }
-];
-
 // -------------------------------------------------------------------------- //
 
 router.post('/', async (req, res) => {
@@ -49,14 +43,14 @@ router.post('/', async (req, res) => {
     createdBy: req.token.uid,
   });
 
-  await draft.populate(draftPopulate);
+  await draft.populate(Draft.draftPopulate);
   return resp(res, 201, 'draft created', draft);
 });
 
 router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), async (req, res) => {
   if (req.params.draftId) {
     console.log(req.params.draftId);
-    const draft = await Draft.findById(req.params.draftId).populate(draftPopulate);
+    const draft = await Draft.findById(req.params.draftId).populate(Draft.draftPopulate);
 
     if (!draft) return resp(res, 404, 'not found');
     if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
@@ -64,7 +58,7 @@ router.get('/{:draftId}', validateObjectIds('draftId', { allowEmpty: true }), as
     return resp(res, 200, 'fetched draft', draft);
   }
 
-  const drafts = await Draft.find({ createdBy: req.token.uid }).populate(draftPopulate);
+  const drafts = await Draft.find({ createdBy: req.token.uid }).populate(Draft.draftPopulate);
   return resp(res, 200, 'fetched all drafts', drafts);
 });
 
@@ -109,7 +103,7 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
   delete draft.cost;
 
   await draft.save();
-  await draft.populate(draftPopulate);
+  await draft.populate(Draft.draftPopulate);
 
   return resp(res, 200, 'draft updated', draft);
 });
@@ -149,7 +143,7 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
     }
   }
 
-  await draft.populate(draftPopulate);
+  await draft.populate(Draft.draftPopulate);
   const prices = await Price.find({ shop: draft.shop }).lean();
 
   try {
@@ -180,7 +174,7 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
       [job] = await Job.create([{
         ...draft,
         status: 'submitted',
-        statusHistory: [{ status: 'submitted', at: Date.now(), by: req.token.uid }]
+        statusHistory: [{ by: 'user', status: 'submitted' }]
       }], { session });
 
       await runSideEffects('submitted', job, session);

@@ -1,22 +1,50 @@
 const mongoose = require('mongoose');
 
-const shopSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  address: { type: String, required: true },
+// TODO: add validations
 
-  capabilities: { type: [String], required: true },
-  
+const shopSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  coordinates: {
+    required: true,
+    type: [ Number ],
+  },
+  capabilities: {
+    required: true,
+    type: [ String ],
+  },
+  isDisabled: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  isOnline: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  lastSeen: {
+    type: Date,
+    required: true,
+    default: new Date(0),
+  },
   owner: {
     ref: 'User',
+    unique: true,
+    required: true,
     type: mongoose.Schema.Types.ObjectId,
-    required: true, unique: true, index: true,
   },
-
-  lastSeen: { type: Date, required: true, default: new Date(0) },
-  isOnline: { type: Boolean, required: true, default: false },
-  isDisabled: { type: Boolean, required: true, default: false },
 }, {
-  versionKey: false, timestamps: false
+  timestamps: false,
+  versionKey: false,
 });
 
-module.exports = mongoose.model('Shop', shopSchema);
+const Shop = mongoose.model('Shop', shopSchema);
+
+module.exports = Shop;

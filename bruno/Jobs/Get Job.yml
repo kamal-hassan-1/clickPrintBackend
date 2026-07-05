@@ -1,5 +1,5 @@
 info:
-  name: Get Job By ID
+  name: Get Job
   type: http
   seq: 1
 

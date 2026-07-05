@@ -13,13 +13,12 @@ const { validateTransition, runSideEffects } = require('../func/jobs');
 // -------------------------------------------------------------------------- //
 
 router.get('/{:jobId}', validateObjectIds('jobId', { allowEmpty: true }), async (req, res) => {
-  let query = (req.token.sid) ? { forShop: req.token.sid } : { createdBy: req.token.uid };
+  let query = (req.token.sid) ? { shop: req.token.sid } : { createdBy: req.token.uid };
 
   if (req.params.jobId) {
     const job = await Job
       .findOne({ _id: req.params.jobId, ...query })
-      .populate('createdBy', 'name number')
-      .sort({ createdAt: 1 });
+      .populate(Job.jobPopulate);
 
     if (!job) return resp(res, 404, 'not found');
     return resp(res, 200, 'fetched job', job);
@@ -27,7 +26,7 @@ router.get('/{:jobId}', validateObjectIds('jobId', { allowEmpty: true }), async 
 
   const jobs = await Job
     .find(query)
-    .populate('createdBy', 'name number')
+    .populate(Job.jobPopulate)
     .sort({ createdAt: 1 });
 
   return resp(res, 200, 'fetched all jobs', jobs);

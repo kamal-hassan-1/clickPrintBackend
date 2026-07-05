@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
-module.exports = mongoose.model('User', new mongoose.Schema({
+// TODO: add validations
 
+const userSchema = new mongoose.Schema({
   name: {
     default: '',
     type: String,
@@ -9,12 +10,19 @@ module.exports = mongoose.model('User', new mongoose.Schema({
   balance: {
     default: 0,
     type: Number,
-  },
-  number: {
-    type: String,
-    unique: true,
-    index: true,
     required: true,
   },
+  number: {
+    index: true,
+    unique: true,
+    type: String,
+    required: true,
+  },
+}, {
+  timestamps: false,
+  versionKey: false,
+});
 
-}, { versionKey: false, timestamps: false }));
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

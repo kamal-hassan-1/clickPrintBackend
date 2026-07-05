@@ -1,12 +1,30 @@
 const mongoose = require('mongoose');
 
+// TODO: add validations
+
 const priceSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    rate: { type: Number, required: true },
-    keys: { type: mongoose.Schema.Types.Mixed, required: true },
-    shop: { ref: 'Shop', required: true, type: mongoose.Schema.Types.ObjectId },
+  name: {
+    type: String,
+    required: true,
+  },
+  rate: {
+    type: Number,
+    required: true,
+  },
+  keys: { 
+    required: true,
+    type: mongoose.Schema.Types.Mixed,
+  },
+  shop: {
+    ref: 'Shop',
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+  },
 }, {
-    versionKey: false, timestamps: false
+  timestamps: false,
+  versionKey: false,
 });
 
-module.exports = mongoose.model('Price', priceSchema);
+const Price = mongoose.model('Price', priceSchema);
+
+module.exports = Price;
