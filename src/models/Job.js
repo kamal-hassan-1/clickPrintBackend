@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 const Draft = require('./Draft');
 
 const jobSchema = Draft.draftSchema.clone();
-const jobStatusEnum = ['submitted', 'queued', 'printing'];
+const jobStatusEnum = [
+  'submitted', 'queued', 'printing',
+  'cancelled', 'completed', 'failed'
+];
 
 const statusHistorySchema = new mongoose.Schema({
   at: {

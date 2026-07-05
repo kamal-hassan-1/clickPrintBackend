@@ -45,7 +45,7 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
     const job = await Job.findById(jobId);
     if (!job) return resp(res, 404, 'not found');
 
-    if (role === 'shop' && !job.forShop.equals(req.token.sid)) return resp(res, 403, 'forbidden');
+    if (role === 'shop' && !job.shop.equals(req.token.sid)) return resp(res, 403, 'forbidden');
     if (role === 'user' && !job.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
 
     const check = validateTransition(job.status, nextStatus, role);
@@ -57,9 +57,13 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
 
     await runSideEffects(nextStatus, job);
 
-    notifyShopOnJobsUpdate(job.forShop.toString());
+    notifyShopOnJobsUpdate(job.shop.toString());
+
+    await job.populate(Job.jobPopulate);
     return resp(res, 200, 'job status updated', job);
-  } catch (err) {
+  }
+  
+  catch (err) {
     next(err);
   }
 });

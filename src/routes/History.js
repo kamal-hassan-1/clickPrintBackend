@@ -7,13 +7,14 @@ const History = require('../models/History');
 // -------------------------------------------------------------------------- //
 
 router.get('/', async (req, res) => {
-  const history = await History.find(
-    (req.token.sid)
-      ? { forShop: req.token.sid }
-      : { createdBy: req.token.uid }
-  );
+  const query = (req.token.sid)
+    ? { shop: req.token.sid }
+    : { createdBy: req.token.uid };
 
-  return resp(res, 200, 'fetched history', history);
+  const history = await History.find(query)
+    .populate(History.historyPopulate);
+
+  return resp(res, 200, 'fetched history', { history });
 });
 
 // -------------------------------------------------------------------------- //
