@@ -33,7 +33,7 @@ const upload = multer({
 });
 
 function validateFileId(fileId) {
-  return /^[0-9a-f]{24}$/.test(fileId)
+  return /^([0-9a-f]{24}|[0-9a-f]{32})$/.test(fileId)
 }
 
 function requireServiceToken(req, res, next) {
