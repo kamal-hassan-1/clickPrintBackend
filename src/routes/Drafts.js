@@ -158,10 +158,44 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
 });
 
 router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, next) => {
-  const draft = await Draft.findById(req.params.draftId).lean();
+  const draft = await Draft.findById(req.params.draftId);
 
   if (!draft) return resp(res, 404, 'not found');
   if (!draft.createdBy.equals(req.token.uid)) return resp(res, 403, 'forbidden');
+
+  // Re-run the same validation and cost calculation as /:draftId/check so the
+  // job is priced fresh at submit time, regardless of whether the client ever
+  // called /check first.
+  if (!draft.shop) {
+    return resp(res, 400, 'draft is missing shop');
+  }
+
+  if (!Array.isArray(draft.files) || draft.files.length === 0) {
+    return resp(res, 400, 'draft has no files');
+  }
+
+  for (const [index, file] of draft.files.entries()) {
+    if (!file.file) {
+      return resp(res, 400, `files[${index}] is missing file`);
+    }
+    if (!file.settings) {
+      return resp(res, 400, `files[${index}] is missing settings`);
+    }
+  }
+
+  await draft.populate(Draft.draftPopulate);
+  const prices = await Price.find({ shop: draft.shop }).lean();
+
+  try {
+    draft.cost = calculateJobCost(draft.files, prices);
+  }
+  catch (err) {
+    return resp(res, 400, `unable to price job (${err.message})`);
+  }
+
+  // Revert the populated refs (shop, createdBy, files.file) back to ObjectIds
+  // so the draft data can be copied straight into the new Job document.
+  draft.depopulate();
 
   const session = await mongoose.startSession();
 
@@ -172,7 +206,7 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
       await Draft.deleteOne({ _id: req.params.draftId }, { session });
 
       [job] = await Job.create([{
-        ...draft,
+        ...draft.toObject(),
         status: 'submitted',
         statusHistory: [{ by: 'user', status: 'submitted' }]
       }], { session });

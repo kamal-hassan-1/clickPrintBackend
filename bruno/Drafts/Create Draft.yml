@@ -8,7 +8,24 @@ http:
   url: "{{host}}/api/drafts"
   body:
     type: json
-    data: ""
+    data: |-
+      {
+        "shop": "6a3cded8705669a8f5981125",
+        "files": [
+          {
+            "file": "6a49ec8be6e5eec87a1f6444",
+            "settings": {
+              "color": true,
+              "pageType": "A4",
+              "pagesPerSheet": 1,
+              "numberOfCopies": 1,
+              "sidedness": "none",
+              "pageSelection": "",
+              "orientation": "portrait"
+            }
+          }
+        ]
+      }
   auth: inherit
 
 settings:
