@@ -1,7 +1,3 @@
-const File = require('../models/File');
-
-// -------------------------------------------------------------------------- //
-
 // Flat fee added to every job, in the same currency unit as price rates.
 const SERVICE_FEE = 10;
 
@@ -39,10 +35,17 @@ function countSelectedPages(selection, totalPages) {
   return pages.size || totalPages;
 }
 
+// Whether a file's sidedness setting means double-sided printing. Settings use
+// "none" for single-sided and "long" / "short" (edge binding) for double-sided;
+// prices express this as a boolean (double = true).
+function isDoubleSided(sidedness) {
+  return !!sidedness && sidedness !== 'none';
+}
+
 // Normalizes a draft file's settings into the flat shape that price `keys`
 // are matched against. This bridges the naming differences between the two:
-// settings use `color`, prices use `colored`; settings express sidedness as
-// "single" / "long" / "short", prices express it as a boolean (double = true).
+// settings use `color`, prices use `colored`; settings express sidedness as a
+// string, prices express it as a boolean (double = true).
 function normalizeSettings(settings) {
   return {
     color: !!settings.color,
@@ -50,7 +53,7 @@ function normalizeSettings(settings) {
     pageType: settings.pageType,
     orientation: settings.orientation,
     pagesPerSheet: settings.pagesPerSheet,
-    sidedness: settings.sidedness !== 'single',
+    sidedness: isDoubleSided(settings.sidedness),
   };
 }
 
@@ -83,7 +86,7 @@ function selectPrice(prices, settings, fileIndex) {
 // are imposed per side and whether printing is double sided.
 function sheetsPerCopy(selectedPages, settings) {
   const slotsPerSide = settings.pagesPerSheet || 1;
-  const sidesPerSheet = settings.sidedness === 'single' ? 1 : 2;
+  const sidesPerSheet = isDoubleSided(settings.sidedness) ? 2 : 1;
   return Math.ceil(selectedPages / (slotsPerSide * sidesPerSheet));
 }
 
@@ -91,22 +94,18 @@ function sheetsPerCopy(selectedPages, settings) {
 
 // Builds the cost breakdown for a set of draft files against a shop's prices.
 //
-//   files  - draft files: [{ fileId, settings }]
+//   files  - populated draft files: [{ file: { _id, originalName, numberOfPages }, settings }]
 //   prices - the shop's Price documents: [{ name, rate, keys }]
 //
 // Returns { lines, extra, total } matching the draft `cost` sub schema:
 //   lines: [ [label, sheets, rate, amount], ... ]
 //   extra: [ [label, amount], ... ]
 //   total: number
-const calculateJobCost = async (files, prices) => {
-  const fileIds = files.map(file => file.file);
-  const fileDocs = await File.find({ _id: { $in: fileIds } }).lean();
-  const pageCounts = new Map(fileDocs.map(doc => [doc._id, doc.numberOfPages]));
-
+const calculateJobCost = (files, prices) => {
   const lines = files.map((file, index) => {
-    const totalPages = pageCounts.get(file._id);
+    const totalPages = file.file.numberOfPages;
     if (totalPages == null) {
-      throw new Error(`Unknown file for file[${index}] (${file._id})`);
+      throw new Error(`Missing page count for file[${index}]`);
     }
 
     const price = selectPrice(prices, file.settings, index);

@@ -152,12 +152,12 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
   await draft.populate(draftPopulate);
   const prices = await Price.find({ shop: draft.shop }).lean();
 
-  // try {
-  //   draft.cost = await calculateJobCost(draft.files, prices);
-  // }
-  // catch (err) {
-  //   return resp(res, 400, `unable to price job (${err.message})`);
-  // }
+  try {
+    draft.cost = calculateJobCost(draft.files, prices);
+  }
+  catch (err) {
+    return resp(res, 400, `unable to price job (${err.message})`);
+  }
 
   await draft.save();
   return resp(res, 200, 'draft checked', draft);
@@ -174,9 +174,6 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
   try {
     let job;
 
-    // Convert the draft into a submitted job and charge the wallet as one
-    // unit of work: if deductWallet throws (e.g. insufficient funds), the
-    // job creation and draft deletion roll back together.
     await session.withTransaction(async () => {
       await Draft.deleteOne({ _id: req.params.draftId }, { session });
 
@@ -189,7 +186,7 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
       await runSideEffects('submitted', job, session);
     });
 
-    notifyShopOnJobsUpdate(job.forShop.toString());
+    notifyShopOnJobsUpdate(job.shop.toString());
     return resp(res, 200, 'job created', job);
   }
 
