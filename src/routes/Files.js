@@ -33,7 +33,7 @@ const upload = multer({
 });
 
 function validateFileId(fileId) {
-  return /^[0-9a-f]{32}$/.test(fileId)
+  return /^[0-9a-f]{24}$/.test(fileId)
 }
 
 function requireServiceToken(req, res, next) {
@@ -86,7 +86,7 @@ router.put('/:fileId', requireServiceToken, async (req, res) => {
 // -------------------------------------------------------------------------- //
 
 router.post('/', upload.single('file'), async (req, res) => {
-  if (!req.file) return resp(res, 400, 'No File Provided');
+  if (!req.file) return resp(res, 400, 'no file provided');
 
   if (req.file.mimetype !== 'application/pdf') {
     const promise = new Promise((resolve, reject) => {
@@ -127,16 +127,16 @@ router.post('/', upload.single('file'), async (req, res) => {
 
   const metadata = Object.values(await response.json())[0];
 
-  fs.renameSync(req.file.path, path.join(STORAGE_DIR, req.file.filename));
-
-  await File.create({
-    fileId: req.file.filename,
+  const file = await File.create({
     uploadedBy: req.token.uid,
     numberOfPages: metadata.PageCount,
     originalName: req.file.originalname,
-  });
+  })
 
-  return resp(res, 201, 'File Uploaded Successfully', { fileId: req.file.filename });
+  await file.populate('uploadedBy', 'name number');
+  fs.renameSync(req.file.path, path.join(STORAGE_DIR, file._id.toString()));
+
+  return resp(res, 201, 'file uploaded', { file });
 });
 
 // -------------------------------------------------------------------------- //

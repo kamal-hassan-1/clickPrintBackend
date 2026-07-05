@@ -99,14 +99,14 @@ function sheetsPerCopy(selectedPages, settings) {
 //   extra: [ [label, amount], ... ]
 //   total: number
 const calculateJobCost = async (files, prices) => {
-  const fileIds = files.map(file => file.fileId);
-  const fileDocs = await File.find({ fileId: { $in: fileIds } }).lean();
-  const pageCounts = new Map(fileDocs.map(doc => [doc.fileId, doc.numberOfPages]));
+  const fileIds = files.map(file => file.file);
+  const fileDocs = await File.find({ _id: { $in: fileIds } }).lean();
+  const pageCounts = new Map(fileDocs.map(doc => [doc._id, doc.numberOfPages]));
 
   const lines = files.map((file, index) => {
-    const totalPages = pageCounts.get(file.fileId);
+    const totalPages = pageCounts.get(file._id);
     if (totalPages == null) {
-      throw new Error(`Unknown file for file[${index}] (${file.fileId})`);
+      throw new Error(`Unknown file for file[${index}] (${file._id})`);
     }
 
     const price = selectPrice(prices, file.settings, index);

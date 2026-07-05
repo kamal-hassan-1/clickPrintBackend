@@ -149,26 +149,14 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
     }
   }
 
-  const forShop = draft.shop;
+  const prices = await Price.find({ shop: draft.shop }).lean();
 
-  // calculateJobCost matches against the File string ids, not the ObjectId
-  // refs stored on the draft, so pull them in before costing.
-  await draft.populate({ path: 'docs.file', select: 'fileId' });
-  const files = draft.docs.map(doc => ({
-    fileId: doc.file.fileId,
-    settings: doc.settings,
-  }));
-
-  const prices = await Price.find({ shop: forShop }).lean();
-
-  let cost;
   try {
-    cost = await calculateJobCost(files, prices);
-  } catch (err) {
+    draft.cost = await calculateJobCost(draft.docs, prices);
+  }
+  catch (err) {
     return resp(res, 400, `unable to price job (${err.message})`);
   }
-
-  draft.cost = cost;
 
   await draft.save();
   await draft.populate(draftPopulate);
