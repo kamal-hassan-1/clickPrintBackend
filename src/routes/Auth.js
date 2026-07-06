@@ -116,6 +116,14 @@ router.post('/verify', async (req, res) => {
   return resp(res, 200, 'otp verified', { token, profile: user, shop: shop || undefined });
 });
 
+router.post('/token', async (req, res) => {
+  const { number } = req.body || {};
+  const user = User.findOne({ number });
+  if (!user) return resp(res, 403, 'user not found');
+  const token = jwt.sign({ uid: user._id }, process.env.JWT_SECRET);
+  return resp(res, 200, '', { token });
+});
+
 // -------------------------------------------------------------------------- //
 
 module.exports = router;
