@@ -40,6 +40,14 @@ const shopSchema = new mongoose.Schema({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
   },
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+  timings: {
+    required: true,
+    type: [ String ],
+  },
 }, {
   timestamps: false,
   versionKey: false,
