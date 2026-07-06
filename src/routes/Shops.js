@@ -86,7 +86,7 @@ router.patch('/:shopId/isOnline', validateObjectIds('shopId'), async (req, res) 
   const shop = await Shop.findByIdAndUpdate(
     req.params.shopId,
     { isOnline: true, lastSeen: new Date() },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!shop) return resp(res, 404, 'not found');

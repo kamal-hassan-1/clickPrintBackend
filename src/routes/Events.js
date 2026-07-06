@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
   res.write(`event: connected\ndata: \n\n`);
 
   const ping = setInterval(async () => {
-    const shop = await Shop.findById(shopId);
+    const shop = await Shop.findById(req.token.sid);
 
     if (shop.lastSeen < (Date.now() - 10000)) {
       shop.isOnline = false;
