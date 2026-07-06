@@ -121,7 +121,7 @@ router.post('/token', async (req, res) => {
   const user = User.findOne({ number });
   if (!user) return resp(res, 403, 'user not found');
   const token = jwt.sign({ uid: user._id }, process.env.JWT_SECRET);
-  return resp(res, 200, '', { token });
+  return resp(res, 200, '', { token, user });
 });
 
 // -------------------------------------------------------------------------- //
