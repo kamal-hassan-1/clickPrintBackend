@@ -41,9 +41,31 @@ services:
     volumes:
       - ./files:/app/files
     environment:
+      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN}
+      JWT_SECRET: thisisabadsecretthisisabadsecret
+      MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
+      CP_BOT_URL: http://bot
+      CP_BOT_KEY: thisisabadsecretthisisabadsecret
       NOTIFYBOT_URL: ${NOTIFYBOT_URL}
       INTERNAL_URL: http://backend:3000
       GOTENBERG_URL: http://gotenberg:3000
-      JWT_SECRET: thisisabadsecretthisisabadsecret
-      MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
-      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN}
+      GOTENBERG_WEBHOOK_URL: http://backend
+      SERVICE_KEY: 123123123
+  
+  # bot:
+  #   image: ghcr.io/wecodepk/clickprintbot
+  #   restart: unless-stopped
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - wckdpk
+  #   volumes:
+  #     - ./volumes/bot:/data
+  #   environment:
+  #     REDIS_URL: redis://redis:6379
+  #     CLICKPRINT_API_URL: http://backend:3000
+  #     WWEBJS_CLIENT_ID: ${WWEBJS_CLIENT_ID:-clickprint}
+  #     TOKEN_TTL_SECONDS: ${TOKEN_TTL_SECONDS:-2592000}
+  #     LOG_LEVEL: ${LOG_LEVEL:-info}
+  #     WWEBJS_DATA_PATH: /data

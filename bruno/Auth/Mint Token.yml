@@ -1,17 +1,16 @@
 info:
-  name: Super Bad Token
+  name: Mint Token
   type: http
   seq: 3
 
 http:
   method: POST
-  url: "{{host}}/api/auth/verify"
+  url: "{{host}}/api/auth/token"
   body:
     type: json
     data: |-
       {
-        "code": "27883",
-        "number": "{{number}}"
+        "number": "923235400292"
       }
 
 runtime:

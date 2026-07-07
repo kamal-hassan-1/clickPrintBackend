@@ -5,7 +5,10 @@ exports.jwtAuth = (req, res, next) => {
   const header = req.headers.authorization;
   if (!header) return resp(res, 401, 'Missing Authorization Header');
 
-  const token = header.split(' ')[1];
+  const [scheme, token] = header.split(' ');
+  if (!scheme || scheme.toLowerCase() !== 'bearer') {
+    return resp(res, 401, 'Invalid Authorization Scheme');
+  }
   if (!token) return resp(res, 401, 'Malformed Authorization Header');
 
   try {
@@ -14,4 +17,21 @@ exports.jwtAuth = (req, res, next) => {
   } catch (err) {
     return resp(res, 401, 'Invalid or Expired JWT');
   }
+};
+
+exports.keyAuth = (req, res, next) => {
+  const header = req.headers.authorization;
+  if (!header) return resp(res, 401, 'missing authorization header');
+
+  const [scheme, key] = header.split(' ');
+  if (!scheme || scheme.toLowerCase() !== 'apikey') {
+    return resp(res, 401, 'invalid authorization scheme');
+  }
+  if (!key) return resp(res, 401, 'malformed authorization header');
+
+  if (key !== process.env.SERVICE_KEY) {
+    return resp(res, 403, 'invalid service key');
+  }
+
+  return next();
 };

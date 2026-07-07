@@ -7,6 +7,7 @@ const Otp = require('../models/Otp');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
 
+const { keyAuth } = require('../func/auth');
 const { resp, sendViaNotifyBot } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -116,8 +117,18 @@ router.post('/verify', async (req, res) => {
   return resp(res, 200, 'otp verified', { token, profile: user, shop: shop || undefined });
 });
 
-router.post('/token', async (req, res) => {
-  return resp(res, 200, '', { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2YTQyYzQ1YjU2MDIyYjY4N2ZjZGY4ZTEiLCJzaWQiOiI2YTQ2MzRmODBhOTExMzMyMDE3NjdiZDAiLCJpYXQiOjE3ODMzNjk1MDIsImV4cCI6MTc4NTk2MTUwMn0.ytxnQIEU6CgL67TIu7EJ5xxqhuH2ITxwD96upyRnsUo"});
+router.post('/token', keyAuth, async (req, res) => {
+  const { number } = req.body || {};
+  if (!number) return resp(res, 400, 'number is required');
+
+  const user = await User.findOneAndUpdate(
+    { number },
+    { $setOnInsert: { number } },
+    { upsert: true, new: true }
+  );
+
+  const token = jwt.sign({ uid: user._id }, process.env.JWT_SECRET);
+  return resp(res, 200, 'token created', { token });
 });
 
 // -------------------------------------------------------------------------- //
