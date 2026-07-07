@@ -37,6 +37,8 @@ router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
   return resp(res, 200, 'Shop updated successfully', { shop });
 });
 
+// -------------------------------------------------------------------------- //
+
 router.post('/:shopId/prices', validateObjectIds('shopId'), async (req, res) => {
   const { name, rate, keys } = req.body || {};
   
@@ -47,6 +49,11 @@ router.post('/:shopId/prices', validateObjectIds('shopId'), async (req, res) => 
     name, rate, keys,
     shop: req.token.sid,
   });
+
+  // Recompute capabilities from the full price list and sync the shop
+  const prices = await Price.find({ shop: req.token.sid }).lean();
+  const capabilities = extrapolateCapabilities(prices);
+  await Shop.updateOne({ _id: req.token.sid }, { $set: { capabilities } });
 
   return resp(res, 201, 'created price', {price});
 });
@@ -67,6 +74,12 @@ router.put('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), a
   );
 
   if (!price) return resp(res, 404, 'not found');
+
+    // Recompute capabilities from the full price list and sync the shop
+  const prices = await Price.find({ shop: req.token.sid }).lean();
+  const capabilities = extrapolateCapabilities(prices);
+  await Shop.updateOne({ _id: req.token.sid }, { $set: { capabilities } });
+
   return resp(res, 200, 'updated price', {price});
 });
 
@@ -76,8 +89,16 @@ router.delete('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId')
   const price = await Price.findOneAndDelete({ _id: req.params.priceId, shop: req.params.shopId });
 
   if (!price) return resp(res, 404, 'not found');
+
+    // Recompute capabilities from the full price list and sync the shop
+  const prices = await Price.find({ shop: req.token.sid }).lean();
+  const capabilities = extrapolateCapabilities(prices);
+  await Shop.updateOne({ _id: req.token.sid }, { $set: { capabilities } });
+
   return resp(res, 200, 'deleted price');
 });
+
+// -------------------------------------------------------------------------- //
 
 router.patch('/:shopId/isOnline', validateObjectIds('shopId'), async (req, res) => {
   if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
