@@ -6,6 +6,7 @@ const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
 
+const { notifyUserOnJobStatus } = require('../func/push');
 const { resp, validateObjectIds } = require('../func/misc');
 const { sseClients, notifyShopOnJobsUpdate } = require('../func/sse');
 const { validateTransition, runSideEffects } = require('../func/jobs');
@@ -53,10 +54,11 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
 
     job.status = nextStatus;
     job.statusHistory.push({ status: nextStatus, by: role, at: new Date() });
-    await job.save();
 
+    await job.save();
     await runSideEffects(nextStatus, job);
 
+    notifyUserOnJobStatus(job);
     notifyShopOnJobsUpdate(job.shop.toString());
 
     await job.populate(Job.jobPopulate);
