@@ -76,7 +76,7 @@ async function sendPush(pushTokens, { title, body, data }) {
 // -------------------------------------------------------------------------- //
 
 async function notifyUserOnJobStatus(job) {
-  const user = User.findById(job.createdBy);
+  const user = await User.findById(job.createdBy);
 
   const tickets = await sendPush(user.pushTokens, {
     ...templates[job.status],

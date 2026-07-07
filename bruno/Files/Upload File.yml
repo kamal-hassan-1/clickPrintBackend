@@ -12,8 +12,8 @@ http:
       - name: file
         type: file
         value:
-          - /home/ahad/Downloads/ntn wecode.pdf
-        contentType: application/pdf
+          - C:\Users\Ahad\Downloads\20230508_235825.jpg
+        contentType: image/jpeg
   auth: inherit
 
 settings:

@@ -46,3 +46,4 @@ services:
       GOTENBERG_URL: http://gotenberg:3000
       JWT_SECRET: thisisabadsecretthisisabadsecret
       MONGODB_URI: mongodb://mongo/ClickPrint?authSource=admin
+      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN}
