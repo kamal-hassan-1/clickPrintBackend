@@ -58,7 +58,7 @@ router.patch('/:jobId/status', validateObjectIds('jobId'), async (req, res, next
     await job.save();
     await runSideEffects(nextStatus, job);
 
-    notifyUserOnJobStatus(job);
+    await notifyUserOnJobStatus(job);
     notifyShopOnJobsUpdate(job.shop.toString());
 
     await job.populate(Job.jobPopulate);
