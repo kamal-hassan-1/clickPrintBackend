@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  pushTokens: {
+    default: [],
+    required: true,
+    type: [ String ],
+  }
 }, {
   timestamps: false,
   versionKey: false,

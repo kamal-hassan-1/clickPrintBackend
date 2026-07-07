@@ -26,6 +26,18 @@ router.patch('/', async (req, res) => {
   return resp(res, 200, 'profile updated', { profile: user });
 });
 
+router.post('/pushTokens', async (req, res) => {
+  const { expoPushToken } = req.body || {};
+
+  const user = await User.updateOne(
+    { _id: req.token.uid },
+    { $addToSet: { pushTokens: expoPushToken } },
+    { new: true }
+  );
+
+  return resp(res, 200, 'added push token', { tokens: user.pushTokens })
+});
+
 // -------------------------------------------------------------------------- //
 
 module.exports = router;
