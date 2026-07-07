@@ -6,6 +6,7 @@ const Price = require('../models/Price');
 
 const { sseClients } = require('../func/sse');
 const { resp, validateObjectIds } = require('../func/misc');
+const { extrapolateCapabilities } = require('../func/shops');
 
 // -------------------------------------------------------------------------- //
 
