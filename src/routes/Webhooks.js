@@ -2,14 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const { resp } = require('../func/misc');
-
-const verifyWebhookSignature = (req, res, next) => {
-  return next();
-};
+const { verifySafepayWebhook } = require('../func/safepay');
 
 // -------------------------------------------------------------------------- //
 
-router.get('/safepay', verifyWebhookSignature, async (req, res) => {
+router.get('/safepay', verifySafepayWebhook(process.env.SAFEPAY_WEBHOOK_SECRET), async (req, res) => {
   return resp(res, 501, 'Not Implemented');
 });
 
