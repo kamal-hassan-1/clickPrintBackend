@@ -10,7 +10,7 @@ const crypto = require('crypto');
  * @param {number} [toleranceMs=300000] - Max allowed timestamp drift in ms. 0 disables the check.
  */
 function verifySafepayWebhook(secretBase64, toleranceMs = 5 * 60 * 1000) {
-  const decodedSecret = Buffer.from(secretBase64, 'base64');
+  const decodedSecret = Buffer.from(secretBase64 || '', 'base64');
 
   return (req, res, next) => {
     const providedSig = req.get('X-SFPY-SIGNATURE');
