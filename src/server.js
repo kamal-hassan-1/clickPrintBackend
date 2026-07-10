@@ -15,7 +15,9 @@ app.set('trust proxy', true);
 
 // -------------------------------------------------------------------------- //
 
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => req.rawBody = buf
+}));
 
 app.use(morgan('combined', {
   skip: (req, res) => req.path === '/health'
