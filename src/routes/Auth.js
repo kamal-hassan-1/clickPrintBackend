@@ -70,7 +70,7 @@ router.post('/otp', async (req, res) => {
     { upsert: true, new: true }
   );
 
-  await sendViaNotifyBot(number, `Your Click Print one-time password (OTP) is: ${code}\n\nDo not share this code with anyone. Click Print will never ask you for your OTP.\n\nThis code expires in 5 minutes.`);
+  await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
   return resp(res, 200, 'otp sent');
 });
 
