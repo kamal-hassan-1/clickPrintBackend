@@ -60,6 +60,7 @@ router.post('/', async (req, res) => {
   }
 
   const topup = await Topup.create({
+    status: 'pending',
     amount,
     shop,
     createdBy: req.token.uid,

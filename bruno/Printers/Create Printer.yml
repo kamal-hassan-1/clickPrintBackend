@@ -1,20 +1,16 @@
 info:
-  name: Approve/Decline
+  name: Create Printer
   type: http
-  seq: 5
+  seq: 1
 
 http:
-  method: PATCH
-  url: "{{host}}/api/topups/:topupId"
-  params:
-    - name: topupId
-      value: ""
-      type: path
+  method: POST
+  url: "{{host}}/api/printers"
   body:
     type: json
     data: |-
       {
-        "action": "approve"
+        "name": "HP LaserJet"
       }
   auth: inherit
 

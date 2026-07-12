@@ -48,6 +48,10 @@ const shopSchema = new mongoose.Schema({
     required: true,
     type: [ String ],
   },
+  walletNumber: {
+    type: String,
+    required: true,
+  }
 }, {
   timestamps: false,
   versionKey: false,

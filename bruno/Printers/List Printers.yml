@@ -1,11 +1,11 @@
 info:
-  name: Raast Topup
+  name: List Printers
   type: http
-  seq: 3
+  seq: 2
 
 http:
-  method: POST
-  url: "{{host}}/api/topups/raast"
+  method: GET
+  url: "{{host}}/api/printers"
   auth: inherit
 
 settings:
