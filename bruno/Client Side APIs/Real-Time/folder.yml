@@ -1,7 +1,7 @@
 info:
-  name: Services
+  name: Real-Time
   type: folder
-  seq: 13
+  seq: 8
 
 request:
   auth: inherit

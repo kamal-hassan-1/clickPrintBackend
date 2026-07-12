@@ -1,7 +1,7 @@
 info:
-  name: Prices [DEPRECATED]
+  name: Internal Service APIs
   type: folder
-  seq: 6
+  seq: 2
 
 request:
   auth: inherit

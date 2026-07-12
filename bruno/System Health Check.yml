@@ -1,7 +1,7 @@
 info:
-  name: Health Check
+  name: System Health Check
   type: http
-  seq: 7
+  seq: 4
 
 http:
   method: GET
