@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // TODO: add validations
 
-const matchKeysSchema = new mongoose.Schema({
+const keysSchema = new mongoose.Schema({
   colored: {
     type: Boolean,
     required: true,
@@ -47,9 +47,9 @@ const serviceSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  matchKeys: {
+  keys: {
     required: true,
-    type: matchKeysSchema,
+    type: keysSchema,
   },
   shop: {
     ref: 'Shop',
@@ -57,8 +57,8 @@ const serviceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
   },
   printers: {
-    type: [servicePrinterSchema],
     required: true,
+    type: [servicePrinterSchema],
   },
 }, {
   timestamps: false,
@@ -66,10 +66,7 @@ const serviceSchema = new mongoose.Schema({
 });
 
 serviceSchema.index({ shop: 1, name: 1 }, { unique: true });
-serviceSchema.index(
-  { shop: 1, 'matchKeys.colored': 1, 'matchKeys.pageType': 1, 'matchKeys.sidedness': 1 },
-  { unique: true },
-);
+serviceSchema.index({ shop: 1, 'keys.colored': 1, 'keys.pageType': 1, 'keys.sidedness': 1 }, { unique: true });
 
 const Service = mongoose.model('Service', serviceSchema);
 

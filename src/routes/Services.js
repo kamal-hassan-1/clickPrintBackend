@@ -14,30 +14,26 @@ const { resp, validateObjectIds } = require('../func/misc');
 // fields ready to write. `shop` is used to ensure referenced printers belong
 // to the caller's shop.
 const buildServiceData = async (body, shop) => {
-  const { name, rate, matchKeys, printers } = body || {};
-
-  if (!name || typeof name !== 'string') {
-    return { error: 'missing or invalid field(s) (name)' };
-  }
+  const { rate, keys, printers } = body || {};
 
   if (typeof rate !== 'number' || !Number.isFinite(rate) || rate < 0) {
     return { error: 'missing or invalid field(s) (rate)' };
   }
 
-  if (!matchKeys || typeof matchKeys !== 'object') {
-    return { error: 'missing or invalid field(s) (matchKeys)' };
+  if (!keys || typeof keys !== 'object') {
+    return { error: 'missing or invalid field(s) (keys)' };
   }
 
-  const { colored, pageType, sidedness } = matchKeys;
+  const { colored, pageType, sidedness } = keys;
 
   if (typeof colored !== 'boolean') {
-    return { error: 'missing or invalid field(s) (matchKeys.colored)' };
+    return { error: 'missing or invalid field(s) (keys.colored)' };
   }
   if (!pageType || typeof pageType !== 'string') {
-    return { error: 'missing or invalid field(s) (matchKeys.pageType)' };
+    return { error: 'missing or invalid field(s) (keys.pageType)' };
   }
   if (typeof sidedness !== 'boolean') {
-    return { error: 'missing or invalid field(s) (matchKeys.sidedness)' };
+    return { error: 'missing or invalid field(s) (keys.sidedness)' };
   }
 
   if (!Array.isArray(printers) || printers.length === 0) {
@@ -68,11 +64,15 @@ const buildServiceData = async (body, shop) => {
     normalizedPrinters.push({ useAuto, printer });
   }
 
+  // Name is derived from the keys, never taken from the client:
+  // <pageType>-<CL|BW>-<DS|SS>, e.g. { A4, colored: false, sidedness: false } -> "A4-BW-SS".
+  const name = `${pageType}-${colored ? 'CL' : 'BW'}-${sidedness ? 'DS' : 'SS'}`;
+
   return {
     data: {
       name,
       rate,
-      matchKeys: { colored, pageType, sidedness },
+      keys: { colored, pageType, sidedness },
       printers: normalizedPrinters,
     },
   };
@@ -89,8 +89,8 @@ const duplicateMessage = (err) => {
   if (keys.includes('name')) {
     return 'a service with this name already exists';
   }
-  if (keys.some((k) => k.startsWith('matchKeys.'))) {
-    return 'a service with these matchKeys already exists';
+  if (keys.some((k) => k.startsWith('keys.'))) {
+    return 'a service with these keys already exists';
   }
 
   return 'a service with these details already exists';

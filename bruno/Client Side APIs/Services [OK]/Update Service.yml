@@ -1,27 +1,29 @@
 info:
-  name: Create Service
+  name: Update Service
   type: http
-  seq: 1
+  seq: 4
 
 http:
-  method: POST
-  url: "{{host}}/api/services"
+  method: PUT
+  url: "{{host}}/api/services/:serviceId"
+  params:
+    - name: serviceId
+      value: 6a53d24864e5a3b32bbb7eb8
+      type: path
   body:
     type: json
     data: |-
       {
-        "name": "A4-BW-DS",
         "rate": 20,
-        "matchKeys": {
+        "keys": {
           "pageType": "A4",
-          "colored": false,
-          "sidedness": false
+          "colored": true,
+          "sidedness": true
         },
-        "shop": "6a513bdbcfe6f9d994fc5c73",
         "printers": [
           {
             "useAuto": true,
-            "printer": "6a5376148f99ff1bdc894f82"
+            "printer": "6a53cfbd1b2ef6b69478ca5e"
           }
         ]
       }
