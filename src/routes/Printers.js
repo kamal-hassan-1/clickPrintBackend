@@ -10,7 +10,7 @@ const { resp, validateObjectIds } = require('../func/misc');
 router.get('/', async (req, res) => {
   if (!req.token.sid) return resp(res, 403, 'forbidden');
 
-  const printers = await Printer.find({ shop: req.token.sid });
+  const printers = await Printer.find({ shop: req.token.sid }).populate(Printer.printerPopulate);
 
   return resp(res, 200, 'fetched printers', { printers });
 });
@@ -26,6 +26,7 @@ router.post('/', async (req, res) => {
       name,
       shop: req.token.sid,
     });
+    await printer.populate(Printer.printerPopulate);
 
     return resp(res, 201, 'created printer', { printer });
   } catch (err) {

@@ -24,4 +24,8 @@ printerSchema.index({ shop: 1, name: 1 }, { unique: true });
 
 const Printer = mongoose.model('Printer', printerSchema);
 
+Printer.printerPopulate = [
+  { path: 'shop', select: 'name' },
+];
+
 module.exports = Printer;
