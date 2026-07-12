@@ -1,0 +1,34 @@
+info:
+  name: Create Service
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/services"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "A4-BW-DS",
+        "rate": 20,
+        "matchKeys": {
+          "pageType": "A4",
+          "colored": false,
+          "sidedness": false
+        },
+        "shop": "6a513bdbcfe6f9d994fc5c73",
+        "printers": [
+          {
+            "useAuto": true,
+            "printer": "6a5376148f99ff1bdc894f82"
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

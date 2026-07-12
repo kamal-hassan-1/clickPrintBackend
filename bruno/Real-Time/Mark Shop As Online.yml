@@ -1,7 +1,7 @@
 info:
   name: Mark Shop As Online
   type: http
-  seq: 7
+  seq: 2
 
 http:
   method: PATCH
