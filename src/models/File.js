@@ -9,7 +9,12 @@ const fileSchema = new mongoose.Schema({
   },
   numberOfPages: {
     type: Number,
+    required: function () { return !this.raw; },
+  },
+  raw: {
+    type: Boolean,
     required: true,
+    default: false,
   },
   createdAt: {
     type: Date,

@@ -47,13 +47,20 @@ async function serveFile(req, res, prefix = '') {
   const { fileId } = req.params;
 
   const filePath = path.join(STORAGE_DIR, prefix, fileId);
-  const fileName = jobs.get(fileId)?.file?.originalname ?? `${fileId}.pdf`;
 
   if (!validateFileId(fileId) || !fs.existsSync(filePath)) {
     return resp(res, 404, 'File Not Found');
   }
 
-  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  // Downloads are always named after the file id. Converted print documents are
+  // PDFs; raw files keep their original extension so they open correctly.
+  let ext = '.pdf';
+  if (!prefix) {
+    const record = await File.findById(fileId).select('originalName raw').lean();
+    if (record?.raw) ext = path.extname(record.originalName);
+  }
+
+  res.setHeader('Content-Disposition', `attachment; filename="${fileId}${ext}"`);
 
   const readStream = fs.createReadStream(filePath);
   readStream.on('error', () => res.destroy());
@@ -87,6 +94,25 @@ router.put('/:fileId', requireServiceToken, async (req, res) => {
 
 router.post('/', upload.single('file'), async (req, res) => {
   if (!req.file) return resp(res, 400, 'no file provided');
+
+  // Callers storing non-print files (e.g. generic uploads) can skip PDF
+  // conversion and metadata extraction to keep the raw file as-is.
+  const skipConversion = ['true', '1', 'yes', 'on'].includes(
+    String(req.body.skipConversion).toLowerCase()
+  );
+
+  if (skipConversion) {
+    const file = await File.create({
+      raw: true,
+      uploadedBy: req.token.uid,
+      originalName: req.file.originalname,
+    });
+
+    await file.populate('uploadedBy', 'name number');
+    fs.renameSync(req.file.path, path.join(STORAGE_DIR, file._id.toString()));
+
+    return resp(res, 201, 'file uploaded', { file });
+  }
 
   if (req.file.mimetype !== 'application/pdf') {
     const promise = new Promise((resolve, reject) => {

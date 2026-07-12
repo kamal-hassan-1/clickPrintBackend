@@ -1,0 +1,26 @@
+info:
+  name: Upload File
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/files"
+  body:
+    type: multipart-form
+    data:
+      - name: skipConversion
+        type: text
+        value: "true"
+      - name: file
+        type: file
+        value:
+          - C:\Users\Ahad\Downloads\20230508_235825.jpg
+        contentType: image/jpeg
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
