@@ -8,7 +8,7 @@ http:
   url: "{{host}}/api/printers/:printerId"
   params:
     - name: printerId
-      value: ""
+      value: 6a53cd678a789a7d3cbaf252
       type: path
   auth: inherit
 
