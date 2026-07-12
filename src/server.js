@@ -82,6 +82,7 @@ app.use('/api/files', jwtAuth, require('./routes/Files.js'));
 app.use('/api/shops', jwtAuth, require('./routes/Shops.js'));
 app.use('/api/drafts', jwtAuth, require('./routes/Drafts.js'));
 app.use('/api/events', jwtAuth, require('./routes/Events.js'));
+app.use('/api/topups', jwtAuth, required('./routes/Topups.js'));
 app.use('/api/history', jwtAuth, require('./routes/History.js'));
 app.use('/api/profile', jwtAuth, require('./routes/Profile.js'));
 
