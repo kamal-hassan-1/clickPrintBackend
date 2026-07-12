@@ -35,9 +35,12 @@ app.use(cors({
 const required = [
   'JWT_SECRET',
   'MONGODB_URI',
-  'INTERNAL_URL',
+  'SERVICE_KEY',
+  'GOTENBERG_WEBHOOK_URL',
   'GOTENBERG_URL',
   'NOTIFYBOT_URL',
+  'EXPO_ACCESS_TOKEN',
+  'SAFEPAY_WEBHOOK_SECRET',
 ];
 
 for (const v of required) {

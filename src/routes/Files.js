@@ -96,8 +96,8 @@ router.post('/', upload.single('file'), async (req, res) => {
     await fetch(`${process.env.GOTENBERG_URL}/forms/libreoffice/convert`, {
       method: 'POST',
       headers: {
-        'Gotenberg-Webhook-Url': `${process.env.INTERNAL_URL}/api/files/${req.file.filename}`,
-        'Gotenberg-Webhook-Error-Url': `${process.env.INTERNAL_URL}/api/files/${req.file.filename}`,
+        'Gotenberg-Webhook-Url': `${process.env.GOTENBERG_WEBHOOK_URL}/api/files/${req.file.filename}`,
+        'Gotenberg-Webhook-Error-Url': `${process.env.GOTENBERG_WEBHOOK_URL}/api/files/${req.file.filename}`,
         'Gotenberg-Webhook-Method': 'PUT',
         'Gotenberg-Webhook-Error-Method': 'PUT',
         'Gotenberg-Webhook-Extra-Http-Headers': JSON.stringify({
@@ -106,7 +106,7 @@ router.post('/', upload.single('file'), async (req, res) => {
       },
       body: buildFormData({
         downloadFrom: [{
-          url: `${process.env.INTERNAL_URL}/api/files/temp/${req.file.filename}`,
+          url: `${process.env.GOTENBERG_WEBHOOK_URL}/api/files/temp/${req.file.filename}`,
           extraHttpHeaders: { 'Authorization': `Bearer ${process.env.SERVICE_TOKEN}` }
         }]
       })
@@ -119,7 +119,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     method: 'POST',
     body: buildFormData({
       downloadFrom: [{
-        url: `${process.env.INTERNAL_URL}/api/files/temp/${req.file.filename}`,
+        url: `${process.env.GOTENBERG_WEBHOOK_URL}/api/files/temp/${req.file.filename}`,
         extraHttpHeaders: { 'Authorization': `Bearer ${process.env.SERVICE_TOKEN}` }
       }]
     })
