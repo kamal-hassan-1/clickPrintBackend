@@ -4,14 +4,13 @@ const router = express.Router();
 
 const Topup = require('../models/Topup');
 const File = require('../models/File');
-const Shop = require('../models/Shop');
 
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
 router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), async (req, res) => {
-  let query = (req.token.sid) ? { shop: req.token.sid } : { createdBy: req.token.uid };
+  let query = { createdBy: req.token.uid };
 
   if (req.params.topupId) {
     const topup = await Topup
@@ -35,44 +34,29 @@ router.post('/raast', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { amount, shop, ppfid } = req.body || {};
+  const { amount, ppfid } = req.body || {};
 
   if (!Number.isInteger(amount) || amount < 10 || amount % 10 !== 0) {
     return resp(res, 400, 'amount must be an integer of at least 10 in multiples of 10');
   }
 
-  if (!shop || !mongoose.isValidObjectId(shop)) {
-    return resp(res, 400, 'missing or invalid fields (shop)');
+  if (!ppfid || !mongoose.isValidObjectId(ppfid)) {
+    return resp(res, 400, 'missing or invalid fields (ppfid)');
   }
 
-  if (!await Shop.exists({ _id: shop })) {
-    return resp(res, 400, 'shop does not exist');
-  }
-
-  if (ppfid) {
-    if (!mongoose.isValidObjectId(ppfid)) {
-      return resp(res, 400, 'missing or invalid fields (ppfid)');
-    }
-
-    if (!await File.exists({ _id: ppfid })) {
-      return resp(res, 400, 'file does not exist');
-    }
+  if (!await File.exists({ _id: ppfid })) {
+    return resp(res, 400, 'file does not exist');
   }
 
   const topup = await Topup.create({
     status: 'pending',
     amount,
-    shop,
+    ppfid,
     createdBy: req.token.uid,
-    paymentProofScreenshotFileId: ppfid || undefined,
   });
 
   await topup.populate(Topup.filePopulate);
   return resp(res, 201, 'topup created', { topup });
-});
-
-router.patch('/:topupId', validateObjectIds('topupId'), async (req, res) => {
-
 });
 
 // -------------------------------------------------------------------------- //

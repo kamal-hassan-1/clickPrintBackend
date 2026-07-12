@@ -1,5 +1,5 @@
 info:
-  name: List Top Ups
+  name: List Topups
   type: http
   seq: 3
 

@@ -1,5 +1,5 @@
 info:
-  name: Create Top Up
+  name: Create Topup
   type: http
   seq: 1
 
@@ -10,9 +10,8 @@ http:
     type: json
     data: |-
       {
-        "amount": 100,
-        "shop": "6a513bdbcfe6f9d994fc5c73",
-        "ppfid": "6a51c3dca6e1966cba786a08",
+        "amount": 1000,
+        "ppfid": "6a51c3dca6e1966cba786a08"
       }
   auth: inherit
 

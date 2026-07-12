@@ -1,5 +1,5 @@
 info:
-  name: Get Top Up
+  name: Get Topup
   type: http
   seq: 2
 
@@ -8,7 +8,7 @@ http:
   url: "{{host}}/api/topups/:topupId"
   params:
     - name: topupId
-      value: 6a53252a29ab7dad194cb08a
+      value: 6a53290f8b2d1b4cb3601ec5
       type: path
   auth: inherit
 
