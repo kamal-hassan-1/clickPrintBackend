@@ -88,6 +88,7 @@ app.use('/api/events', jwtAuth, require('./routes/Events.js'));
 app.use('/api/topups', jwtAuth, require('./routes/Topups.js'));
 app.use('/api/history', jwtAuth, require('./routes/History.js'));
 app.use('/api/profile', jwtAuth, require('./routes/Profile.js'));
+app.use('/api/services', jwtAuth, require('./routes/Services.js'));
 app.use('/api/printers', jwtAuth, require('./routes/Printers.js'));
 
 // -------------------------------------------------------------------------- //

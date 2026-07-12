@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 // TODO: add validations
 
 const topupSchema = new mongoose.Schema({
+  status: {
+    type: String,
+    required: true,
+    enum: ['pending', 'approved', 'declined'],
+  },
   amount: {
     type: Number,
     required: true,
