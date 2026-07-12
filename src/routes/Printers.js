@@ -21,12 +21,17 @@ router.post('/', async (req, res) => {
   if (!name) return resp(res, 400, 'missing or invalid field(s) (name)');
   if (!req.token.sid) return resp(res, 403, 'forbidden');
 
-  const printer = await Printer.create({
-    name,
-    shop: req.token.sid,
-  });
+  try {
+    const printer = await Printer.create({
+      name,
+      shop: req.token.sid,
+    });
 
-  return resp(res, 201, 'created printer', { printer });
+    return resp(res, 201, 'created printer', { printer });
+  } catch (err) {
+    if (err.code === 11000) return resp(res, 409, 'a printer with this name already exists');
+    throw err;
+  }
 });
 
 router.delete('/:printerId', validateObjectIds('printerId'), async (req, res) => {

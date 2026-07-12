@@ -20,6 +20,8 @@ const printerSchema = new mongoose.Schema({
   versionKey: false,
 });
 
+printerSchema.index({ shop: 1, name: 1 }, { unique: true });
+
 const Printer = mongoose.model('Printer', printerSchema);
 
 module.exports = Printer;
