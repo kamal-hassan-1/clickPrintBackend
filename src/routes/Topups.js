@@ -4,6 +4,7 @@ const router = express.Router();
 
 const Topup = require('../models/Topup');
 const File = require('../models/File');
+const User = require('../models/User');
 
 const { resp, validateObjectIds } = require('../func/misc');
 
@@ -27,10 +28,6 @@ router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), as
     .sort({ createdAt: 1 });
 
   return resp(res, 200, 'fetched all topups', {topups});
-});
-
-router.post('/raast', async (req, res) => {
-  return resp(res, 501, 'Not Implemented');
 });
 
 router.post('/', async (req, res) => {
@@ -57,6 +54,44 @@ router.post('/', async (req, res) => {
 
   await topup.populate(Topup.filePopulate);
   return resp(res, 201, 'topup created', { topup });
+});
+
+// Admin-only: verify the payment proof out of band, then approve or decline a
+// pending topup. Approving credits the user's wallet by the topup amount.
+router.patch('/:topupId', validateObjectIds('topupId'), async (req, res) => {
+  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
+
+  const { status } = req.body || {};
+
+  if (status !== 'approved' && status !== 'declined') {
+    return resp(res, 400, 'status must be either approved or declined');
+  }
+
+  // Atomically claim the topup only if it is still pending, so two concurrent
+  // approvals can't credit the wallet twice.
+  const topup = await Topup.findOneAndUpdate(
+    { _id: req.params.topupId, status: 'pending' },
+    { status },
+    { new: true }
+  );
+
+  if (!topup) {
+    // Either it doesn't exist or it was already resolved.
+    if (!await Topup.exists({ _id: req.params.topupId })) {
+      return resp(res, 404, 'not found');
+    }
+    return resp(res, 409, 'topup is not pending');
+  }
+
+  if (status === 'approved') {
+    await User.updateOne(
+      { _id: topup.createdBy },
+      { $inc: { balance: topup.amount } }
+    );
+  }
+
+  await topup.populate(Topup.filePopulate);
+  return resp(res, 200, `topup ${status}`, { topup });
 });
 
 // -------------------------------------------------------------------------- //

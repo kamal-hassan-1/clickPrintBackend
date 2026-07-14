@@ -21,7 +21,9 @@ http:
         ],
         "walletNumber": "03235400291",
         "capabilities": [],
-        "owner": "6a513bec6c5b3d6712b7027e"
+        "owners": [
+          "6a513bec6c5b3d6712b7027e"
+        ]
       }
   auth: inherit
 
