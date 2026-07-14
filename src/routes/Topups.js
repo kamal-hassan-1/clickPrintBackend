@@ -26,7 +26,7 @@ router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), as
   const topups = await Topup
     .find(query)
     .populate(Topup.filePopulate)
-    .sort({ createdAt: 1 });
+    .sort({ createdAt: -1 });
 
   return resp(res, 200, 'fetched all topups', {topups});
 });
