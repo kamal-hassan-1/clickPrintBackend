@@ -6,6 +6,7 @@ const router = express.Router();
 const Otp = require('../models/Otp');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 
 const { keyAuth } = require('../func/auth');
 const { resp, sendViaNotifyBot } = require('../func/misc');
@@ -109,8 +110,9 @@ router.post('/verify', async (req, res) => {
   );
 
   const shop = await Shop.findOne({ owner: user._id });
+  const admin = await Admin.findOne({ user: user._id });
 
-  const payload = { uid: user._id };
+  const payload = { uid: user._id, isAdmin: !!admin };
   if (shop) payload.sid = shop._id;
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });

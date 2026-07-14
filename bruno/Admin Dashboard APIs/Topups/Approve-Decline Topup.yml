@@ -1,5 +1,5 @@
 info:
-  name: Approve/Decline Top Up
+  name: Approve/Decline Topup
   type: http
   seq: 4
 

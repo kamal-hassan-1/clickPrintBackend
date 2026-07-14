@@ -22,6 +22,20 @@ router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), asyn
   return resp(res, 200, 'fetched shops', { shops: await Shop.find({ isDisabled: false }) });
 });
 
+router.post('/', async (req, res) => {
+  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
+
+  const { name, address, coordinates, capabilities, owner, imageUrl, timings, walletNumber } = req.body || {};
+
+  if (!name || !address || !coordinates || !capabilities || !owner || !imageUrl || !timings || !walletNumber) {
+    return resp(res, 400, 'missing or invalid field(s) (name, address, coordinates, capabilities, owner, imageUrl, timings, walletNumber)');
+  }
+
+  const shop = await Shop.create({ name, address, coordinates, capabilities, owner, imageUrl, timings, walletNumber });
+
+  return resp(res, 201, 'created shop', { shop });
+});
+
 router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
   if (!req.token.sid) return resp(res, 403, 'Forbidden');
   if (req.token.sid !== req.params.shopId) return resp(res, 403, 'Forbidden');
