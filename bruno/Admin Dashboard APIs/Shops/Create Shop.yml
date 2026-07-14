@@ -6,6 +6,23 @@ info:
 http:
   method: POST
   url: "{{host}}/api/shops"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Raja Jani Pan Shop",
+        "address": "Dhok Syedan, Rawalpindi",
+        "coordinates": [
+          33.62314, 72.94993
+        ],
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgp1G0mFQaXo51P2Bq0XrwOAzSWO7oG_qPrPYdUCMCu5YIwMBAZFgbaXto&s=10",
+        "timings": [
+          "Mon-Fri: 08:30 - 05:30"
+        ],
+        "walletNumber": "03235400291",
+        "capabilities": [],
+        "owner": "6a513bec6c5b3d6712b7027e"
+      }
   auth: inherit
 
 settings:

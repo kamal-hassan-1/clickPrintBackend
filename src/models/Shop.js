@@ -22,7 +22,7 @@ const shopSchema = new mongoose.Schema({
   isDisabled: {
     type: Boolean,
     required: true,
-    default: false,
+    default: true,
   },
   isOnline: {
     type: Boolean,
