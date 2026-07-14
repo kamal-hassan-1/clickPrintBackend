@@ -11,7 +11,8 @@ const { resp, validateObjectIds } = require('../func/misc');
 // -------------------------------------------------------------------------- //
 
 router.get('/{:topupId}', validateObjectIds('topupId', { allowEmpty: true }), async (req, res) => {
-  let query = { createdBy: req.token.uid };
+  let query = {};
+  if (!req.token.isAdmin) query = { createdBy: req.token.uid };
 
   if (req.params.topupId) {
     const topup = await Topup
