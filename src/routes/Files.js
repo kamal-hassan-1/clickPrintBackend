@@ -6,7 +6,7 @@ const { pipeline } = require('stream/promises');
 
 const File = require('../models/File');
 const { resp } = require('../func/misc');
-const { jwtAuth } = require('./func/auth');
+const { jwtAuth } = require('../func/auth');
 
 // -------------------------------------------------------------------------- //
 
