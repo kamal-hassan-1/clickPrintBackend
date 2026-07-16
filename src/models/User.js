@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isDisabled: {
+    default: false,
+    type: Boolean,
+    required: true,
+  },
   pushTokens: {
     default: [],
     required: true,

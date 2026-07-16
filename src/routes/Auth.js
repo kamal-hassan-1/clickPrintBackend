@@ -9,7 +9,7 @@ const User = require('../models/User');
 const Admin = require('../models/Admin');
 
 const { keyAuth } = require('../func/auth');
-const { resp, sendViaNotifyBot } = require('../func/misc');
+const { resp, sendViaNotifyBot, isValidE164NoPlus } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
 
@@ -18,10 +18,6 @@ const OTP_RESEND_COOLDOWN_MS = 30 * 1000; // 30 seconds
 const OTP_MAX_TRIES = 3;
 const OTP_LENGTH = 5;
 const JWT_EXPIRES_IN = '30d';
-
-function isValidE164NoPlus(number) {
-  return /^[1-9]\d{7,14}$/.test(number);
-}
 
 function generateOtpCode(length) {
   let otp = `${randomInt(1, 10)}`;

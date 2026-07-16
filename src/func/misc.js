@@ -10,6 +10,10 @@ exports.resp = (res, code, message, data = {}) => {
   })
 };
 
+exports.isValidE164NoPlus = (number) => {
+  return /^[1-9]\d{7,14}$/.test(number);
+};
+
 exports.validateObjectIds = (...args) => (req, res, next) => {
   let options = {};
   let params = args;
