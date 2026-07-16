@@ -56,8 +56,7 @@ router.post('/otp', async (req, res) => {
   }
 
   const now = new Date();
-  // const code = generateOtpCode(OTP_LENGTH);
-  const code = "00000";
+  const code = generateOtpCode(OTP_LENGTH);
 
   // Upsert: overwrite any existing OTP for this number with a fresh one
   await Otp.findOneAndUpdate(
@@ -72,7 +71,7 @@ router.post('/otp', async (req, res) => {
     { upsert: true, new: true }
   );
 
-  // await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
+  await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
   return resp(res, 200, 'otp sent');
 });
 
