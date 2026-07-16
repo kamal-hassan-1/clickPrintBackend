@@ -35,13 +35,12 @@ app.use(cors({
 const required = [
   'JWT_SECRET',
   'MONGODB_URI',
-  'SERVICE_KEY',
-  'GOTENBERG_WEBHOOK_URL',
-  'GOTENBERG_URL',
   'NOTIFYBOT_URL',
   'EXPO_ACCESS_TOKEN',
-  'SAFEPAY_WEBHOOK_SECRET',
 ];
+
+process.env.GOTENBERG_URL = process.env.GOTENBERG_URL || 'http://gotenberg:3000';
+process.env.GOTENBERG_WEBHOOK_URL = process.env.GOTENBERG_WEBHOOK_URL || 'http://backend:3000';
 
 for (const v of required) {
   if (!process.env[v]) {
