@@ -6,7 +6,7 @@ const { pipeline } = require('stream/promises');
 
 const File = require('../models/File');
 const { resp } = require('../func/misc');
-const { jwtAuth } = require('../func/auth');
+const { jwtAuth, keyAuth } = require('../func/auth');
 
 // -------------------------------------------------------------------------- //
 
@@ -34,12 +34,7 @@ const upload = multer({
 });
 
 function validateFileId(fileId) {
-  return /^([0-9a-f]{24}|[0-9a-f]{32})$/.test(fileId)
-}
-
-function requireServiceToken(req, res, next) {
-  if (req.token.actor !== 'service') return resp(res, 403, 'Forbidden');
-  next();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(fileId)
 }
 
 // -------------------------------------------------------------------------- //
@@ -70,11 +65,11 @@ async function serveFile(req, res, prefix = '') {
 }
 
 router.get('/:fileId', (req, res) => serveFile(req, res));
-router.get('/temp/:fileId', requireServiceToken, (req, res) => serveFile(req, res, 'temp'));
+router.get('/temp/:fileId', keyAuth, (req, res) => serveFile(req, res, 'temp'));
 
 // -------------------------------------------------------------------------- //
 
-router.put('/:fileId', requireServiceToken, async (req, res) => {
+router.put('/:fileId', keyAuth, async (req, res) => {
   const { fileId } = req.params;
   if (!validateFileId(fileId)) return resp(res, 404, 'File Not Found');
 
@@ -128,13 +123,13 @@ router.post('/', jwtAuth, upload.single('file'), async (req, res) => {
         'Gotenberg-Webhook-Method': 'PUT',
         'Gotenberg-Webhook-Error-Method': 'PUT',
         'Gotenberg-Webhook-Extra-Http-Headers': JSON.stringify({
-          'Authorization': `Bearer ${process.env.SERVICE_TOKEN}`
+          'Authorization': `ApiKey ${process.env.SERVICE_KEY}`
         })
       },
       body: buildFormData({
         downloadFrom: [{
           url: `${process.env.GOTENBERG_WEBHOOK_URL}/api/files/temp/${req.file.filename}`,
-          extraHttpHeaders: { 'Authorization': `Bearer ${process.env.SERVICE_TOKEN}` }
+          extraHttpHeaders: { 'Authorization': `ApiKey ${process.env.SERVICE_KEY}` }
         }]
       })
     });
@@ -147,7 +142,7 @@ router.post('/', jwtAuth, upload.single('file'), async (req, res) => {
     body: buildFormData({
       downloadFrom: [{
         url: `${process.env.GOTENBERG_WEBHOOK_URL}/api/files/temp/${req.file.filename}`,
-        extraHttpHeaders: { 'Authorization': `Bearer ${process.env.SERVICE_TOKEN}` }
+        extraHttpHeaders: { 'Authorization': `ApiKey ${process.env.SERVICE_KEY}` }
       }]
     })
   });

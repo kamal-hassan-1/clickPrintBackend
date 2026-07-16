@@ -29,9 +29,9 @@ exports.keyAuth = (req, res, next) => {
   }
   if (!key) return resp(res, 401, 'malformed authorization header');
 
-  // if (key !== process.env.SERVICE_KEY) {
+  if (key !== process.env.SERVICE_KEY) {
     return resp(res, 403, 'invalid service key');
-  // }
+  }
 
   return next();
 };

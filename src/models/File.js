@@ -1,8 +1,15 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 // TODO: add validations
 
 const fileSchema = new mongoose.Schema({
+  _id: {
+    type: String,
+    required: true,
+    default: () => crypto.randomUUID(),
+  },
+
   originalName: {
     type: String,
     required: true,
