@@ -1,11 +1,11 @@
 info:
-  name: User Stats
+  name: Shops Stats
   type: http
-  seq: 1
+  seq: 2
 
 http:
   method: GET
-  url: "{{host}}/api/stats/users"
+  url: "{{host}}/api/stats/shops"
   auth: inherit
 
 settings:
