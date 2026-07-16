@@ -6,6 +6,7 @@ const { pipeline } = require('stream/promises');
 
 const File = require('../models/File');
 const { resp } = require('../func/misc');
+const { jwtAuth } = require('./func/auth');
 
 // -------------------------------------------------------------------------- //
 
@@ -92,7 +93,7 @@ router.put('/:fileId', requireServiceToken, async (req, res) => {
 
 // -------------------------------------------------------------------------- //
 
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', jwtAuth, upload.single('file'), async (req, res) => {
   if (!req.file) return resp(res, 400, 'no file provided');
 
   // Callers storing non-print files (e.g. generic uploads) can skip PDF
