@@ -18,17 +18,17 @@ router.get('/users', async (req, res) => {
     Shop.distinct('owner'),
   ]);
 
-  const [ users, appUsers ] = await Promise.all([
+  // The buckets partition the users, so admins take precedence over owners and
+  // every count is read off User itself. That keeps the parts summing to the
+  // total regardless of who holds both roles.
+  const [ users, admins, owners, appUsers ] = await Promise.all([
     User.countDocuments(),
+    User.countDocuments({ _id: { $in: adminIds } }),
+    User.countDocuments({ _id: { $in: ownerIds, $nin: adminIds } }),
     User.countDocuments({ _id: { $nin: [ ...adminIds, ...ownerIds ] } }),
   ]);
 
-  return resp(res, 200, 'fetched user stats', {
-    users,
-    admins: adminIds.length,
-    owners: ownerIds.length,
-    appUsers,
-  });
+  return resp(res, 200, 'fetched user stats', { users, admins, owners, appUsers });
 });
 
 // -------------------------------------------------------------------------- //
