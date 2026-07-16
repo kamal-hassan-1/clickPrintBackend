@@ -147,7 +147,7 @@ router.put('/:serviceId', validateObjectIds('serviceId'), async (req, res) => {
     service = await Service.findOneAndUpdate(
       { _id: req.params.serviceId, shop: req.token.sid },
       data,
-      { new: true, runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     ).populate(Service.servicePopulate);
   } catch (err) {
     const message = duplicateMessage(err);

@@ -32,7 +32,7 @@ router.post('/pushTokens', async (req, res) => {
   const user = await User.updateOne(
     { _id: req.token.uid },
     { $addToSet: { pushTokens: expoPushToken } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   return resp(res, 200, 'added push token', { tokens: user.pushTokens })

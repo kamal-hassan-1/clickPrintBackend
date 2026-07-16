@@ -68,7 +68,7 @@ router.post('/otp', async (req, res) => {
       expiry: new Date(now.getTime() + OTP_VALIDITY_MS),
       lastSentAt: now,
     },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
@@ -105,7 +105,7 @@ router.post('/verify', async (req, res) => {
   const user = await User.findOneAndUpdate(
     { number },
     { $setOnInsert: { number } },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   const shop = await Shop.findOne({ owner: user._id });
@@ -126,7 +126,7 @@ router.post('/token', keyAuth, async (req, res) => {
   const user = await User.findOneAndUpdate(
     { number },
     { $setOnInsert: { number } },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   const token = jwt.sign({ uid: user._id }, process.env.JWT_SECRET);

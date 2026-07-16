@@ -73,7 +73,7 @@ router.patch('/:topupId', validateObjectIds('topupId'), async (req, res) => {
   const topup = await Topup.findOneAndUpdate(
     { _id: req.params.topupId, status: 'pending' },
     { status },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!topup) {

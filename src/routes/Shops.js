@@ -46,7 +46,10 @@ router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
   if (address !== undefined) updates.address = address;
   if (capabilities !== undefined) updates.capabilities = capabilities;
 
-  const shop = await Shop.findByIdAndUpdate(req.params.shopId, updates, { new: true, runValidators: true });
+  const shop = await Shop.findByIdAndUpdate(req.params.shopId, updates, {
+    returnDocument: 'after', runValidators: true
+  });
+  
   if (!shop) return resp(res, 404, 'Shop not found');
 
   return resp(res, 200, 'Shop updated successfully', { shop });
@@ -85,7 +88,7 @@ router.put('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), a
   const price = await Price.findOneAndUpdate(
     { _id: req.params.priceId, shop: req.params.shopId },
     updates,
-    { new: true, runValidators: true },
+    { returnDocument: 'after', runValidators: true },
   );
 
   if (!price) return resp(res, 404, 'not found');

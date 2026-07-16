@@ -17,7 +17,7 @@ async function deductWallet(job, session) {
   const updated = await User.findOneAndUpdate(
     { _id: job.createdBy, balance: { $gte: job.cost.total } },
     { $inc: { balance: -job.cost.total } },
-    { session, new: true }
+    { session, returnDocument: 'after' }
   );
 
   if (!updated) {
