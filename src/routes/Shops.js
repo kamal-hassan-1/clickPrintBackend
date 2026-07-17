@@ -2,134 +2,102 @@ const express = require('express');
 const router = express.Router();
 
 const Shop = require('../models/Shop');
-const Price = require('../models/Price');
+const File = require('../models/File');
 
-const { sseClients } = require('../func/sse');
 const { resp, validateObjectIds } = require('../func/misc');
-const { extrapolateCapabilities } = require('../func/shops');
+
+// -------------------------------------------------------------------------- //
+
+router.post('/', async (req, res) => {
+  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
+
+  const { name, address, coordinates, imageFile, contactNumber, googleMapsLink, timings } = req.body || {};
+
+  if (!name || !address || !coordinates || !imageFile || !contactNumber || !timings) {
+    return resp(res, 400, 'missing or invalid field(s) (name, address, coordinates, imageFile, contactNumber, timings)');
+  }
+
+  if (!await File.exists({ _id: imageFile })) {
+    return resp(res, 400, 'imageFile does not exist');
+  }
+
+  const shop = await Shop.create({ name, address, coordinates, imageFile, contactNumber, googleMapsLink, timings });
+
+  return resp(res, 201, 'created shop', { shop });
+});
 
 // -------------------------------------------------------------------------- //
 
 router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), async (req, res) => {
     if (req.params.shopId) {
     const shop = await Shop.findById(req.params.shopId).lean();
-    const prices = await Price.find({ shop: req.params.shopId }).sort({ rate: 1 });
 
     if (!shop) return resp(res, 404, 'not found');
-    return resp(res, 200, 'fetched shop', { shop: {...shop, prices} });
+    return resp(res, 200, 'fetched shop', { shop });
   }
 
-  return resp(res, 200, 'fetched shops', { shops: await Shop.find({ isDisabled: false }) });
+  const filter = req.token.isAdmin ? {} : { isDisabled: false };
+
+  return resp(res, 200, 'fetched shops', { shops: await Shop.find(filter) });
 });
 
-router.post('/', async (req, res) => {
-  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
-
-  const { name, address, coordinates, capabilities, owner, imageUrl, timings, walletNumber } = req.body || {};
-
-  if (!name || !address || !coordinates || !capabilities || !owner || !imageUrl || !timings || !walletNumber) {
-    return resp(res, 400, 'missing or invalid field(s) (name, address, coordinates, capabilities, owner, imageUrl, timings, walletNumber)');
-  }
-
-  const shop = await Shop.create({ name, address, coordinates, capabilities, owner, imageUrl, timings, walletNumber });
-
-  return resp(res, 201, 'created shop', { shop });
-});
+// -------------------------------------------------------------------------- //
 
 router.put('/:shopId', validateObjectIds('shopId'), async (req, res) => {
-  if (!req.token.sid) return resp(res, 403, 'Forbidden');
-  if (req.token.sid !== req.params.shopId) return resp(res, 403, 'Forbidden');
+  const isAdmin = !!req.token.isAdmin;
+  const isOwner = !!req.token.sid && req.token.sid === req.params.shopId;
 
-  const { name, address, capabilities } = req.body || {};
+  if (!isAdmin && !isOwner) return resp(res, 403, 'forbidden');
+
+  const allowed = isAdmin
+    ? ['name', 'address', 'coordinates', 'imageFile', 'contactNumber', 'googleMapsLink', 'timings']
+    : ['contactNumber', 'googleMapsLink', 'timings'];
+
+  const body = req.body || {};
   const updates = {};
-  if (name !== undefined) updates.name = name;
-  if (address !== undefined) updates.address = address;
-  if (capabilities !== undefined) updates.capabilities = capabilities;
+  for (const field of allowed) {
+    if (body[field] !== undefined) updates[field] = body[field];
+  }
+
+  if (updates.imageFile !== undefined && !await File.exists({ _id: updates.imageFile })) {
+    return resp(res, 400, 'imageFile does not exist');
+  }
 
   const shop = await Shop.findByIdAndUpdate(req.params.shopId, updates, {
     returnDocument: 'after', runValidators: true
   });
-  
-  if (!shop) return resp(res, 404, 'Shop not found');
 
-  return resp(res, 200, 'Shop updated successfully', { shop });
+  if (!shop) return resp(res, 404, 'not found');
+
+  return resp(res, 200, 'updated shop', { shop });
 });
 
 // -------------------------------------------------------------------------- //
 
-router.post('/:shopId/prices', validateObjectIds('shopId'), async (req, res) => {
-  const { name, rate, keys } = req.body || {};
-  
-  if (!name || !rate || !keys) return resp(res, 400, 'missing or invalid field(s) (name, rate, keys)');
-  if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
+router.patch('/:shopId/isDisabled', validateObjectIds('shopId'), async (req, res) => {
+  if (!req.token.isAdmin) return resp(res, 403, 'forbidden');
 
-  const price = await Price.create({
-    name, rate, keys,
-    shop: req.token.sid,
-  });
+  const { isDisabled } = req.body || {};
 
-  // Recompute capabilities from the full price list and sync the shop
-  const prices = await Price.find({ shop: req.token.sid }).lean();
-  const capabilities = extrapolateCapabilities(prices);
-  await Shop.updateOne({ _id: req.token.sid }, { $set: { capabilities } });
-
-  return resp(res, 201, 'created price', {price});
-});
-
-router.put('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), async (req, res) => {
-  if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
-
-  const { name, rate, keys } = req.body || {};
-  const updates = {};
-  if (name !== undefined) updates.name = name;
-  if (rate !== undefined) updates.rate = rate;
-  if (keys !== undefined) updates.keys = keys;
-
-  const price = await Price.findOneAndUpdate(
-    { _id: req.params.priceId, shop: req.params.shopId },
-    updates,
-    { returnDocument: 'after', runValidators: true },
-  );
-
-  if (!price) return resp(res, 404, 'not found');
-
-    // Recompute capabilities from the full price list and sync the shop
-  const prices = await Price.find({ shop: req.token.sid }).lean();
-  const capabilities = extrapolateCapabilities(prices);
-  await Shop.updateOne({ _id: req.token.sid }, { $set: { capabilities } });
-
-  return resp(res, 200, 'updated price', {price});
-});
-
-router.delete('/:shopId/prices/:priceId', validateObjectIds('shopId', 'priceId'), async (req, res) => {
-  if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
-
-  const price = await Price.findOneAndDelete({ _id: req.params.priceId, shop: req.params.shopId });
-
-  if (!price) return resp(res, 404, 'not found');
-
-    // Recompute capabilities from the full price list and sync the shop
-  const prices = await Price.find({ shop: req.token.sid }).lean();
-  const capabilities = extrapolateCapabilities(prices);
-  await Shop.updateOne({ _id: req.token.sid }, { $set: { capabilities } });
-
-  return resp(res, 200, 'deleted price');
-});
-
-// -------------------------------------------------------------------------- //
-
-router.patch('/:shopId/isOnline', validateObjectIds('shopId'), async (req, res) => {
-  if (!req.token.sid || req.token.sid !== req.params.shopId) return resp(res, 403, 'forbidden');
-  if (!sseClients.get(req.token.sid)) return resp(res, 400, 'shop must be connected to sse to update');
+  if (typeof isDisabled !== 'boolean') {
+    return resp(res, 400, 'missing or invalid field(s) (isDisabled)');
+  }
 
   const shop = await Shop.findByIdAndUpdate(
     req.params.shopId,
-    { isOnline: true, lastSeen: new Date() },
-    { returnDocument: 'after' }
+    { isDisabled },
+    { returnDocument: 'after', runValidators: true },
   );
 
   if (!shop) return resp(res, 404, 'not found');
-  return resp(res, 200, 'isOnline updated', { shop });
+
+  return resp(res, 200, 'updated shop', { shop });
+});
+
+// -------------------------------------------------------------------------- //
+
+router.delete('/:shopId', validateObjectIds('shopId'), async (req, res) => {
+  return resp(res, 501, 'not implemented yet');
 });
 
 // -------------------------------------------------------------------------- //
