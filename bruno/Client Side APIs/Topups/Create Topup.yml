@@ -11,7 +11,7 @@ http:
     data: |-
       {
         "amount": 1000,
-        "ppfid": "6a51c3dca6e1966cba786a08"
+        "ppfid": "95e498e0-ade0-4b12-9317-00772d61142e"
       }
   auth: inherit
 

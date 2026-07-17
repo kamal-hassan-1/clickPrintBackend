@@ -16,7 +16,7 @@ const topupSchema = new mongoose.Schema({
   ppfid: {
     ref: 'File',
     required: true,
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
   },
   createdAt: {
     type: Date,

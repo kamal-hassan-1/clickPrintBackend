@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
@@ -38,7 +37,7 @@ router.post('/', async (req, res) => {
     return resp(res, 400, 'amount must be an integer of at least 10 in multiples of 10');
   }
 
-  if (!ppfid || !mongoose.isValidObjectId(ppfid)) {
+  if (!ppfid) {
     return resp(res, 400, 'missing or invalid fields (ppfid)');
   }
 
