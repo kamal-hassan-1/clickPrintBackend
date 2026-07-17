@@ -56,7 +56,7 @@ async function serveFile(req, res, prefix = '') {
     if (record?.raw) ext = path.extname(record.originalName);
   }
 
-  res.setHeader('Content-Disposition', `inline; filename="${record.originalName}"`);
+  res.setHeader('Content-Disposition', `inline; filename="${fileId}${ext}"`);
 
   const readStream = fs.createReadStream(filePath);
   readStream.on('error', () => res.destroy());
