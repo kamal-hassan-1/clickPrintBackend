@@ -1,0 +1,42 @@
+info:
+  name: Update Shop (Admin)
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{host}}/api/shops/:shopId"
+  params:
+    - name: shopId
+      value: 6a59bb07132d651de75c66e5
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "name": "EE - Ground Floor",
+        "address": "AB-1, COMSATS, Islamabad",
+        "coordinates": [
+          33.65139,
+          73.15641
+        ],
+        "imageFile": "bafb4781-edc2-4c44-9d23-07706a829bc4",
+        "contactNumber": "03030036076",
+        "googleMapsLink": "https://maps.app.goo.gl/SMpwk6kvJV2mYG8x6",
+        "timings": [
+          "08:30-17:30",
+          "08:30-17:30",
+          "08:30-17:30",
+          "08:30-17:30",
+          "08:30-17:30",
+          "08:30-14:30",
+          "Closed"
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,10 +1,10 @@
 info:
-  name: Get Shop
+  name: Delete Shop (Admin)
   type: http
-  seq: 2
+  seq: 7
 
 http:
-  method: GET
+  method: DELETE
   url: "{{host}}/api/shops/:shopId"
   params:
     - name: shopId

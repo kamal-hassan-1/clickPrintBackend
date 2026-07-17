@@ -1,15 +1,21 @@
 info:
-  name: Get Shop
+  name: Enable/Disable Shop (Admin)
   type: http
-  seq: 2
+  seq: 6
 
 http:
-  method: GET
-  url: "{{host}}/api/shops/:shopId"
+  method: PATCH
+  url: "{{host}}/api/shops/:shopId/isDisabled"
   params:
     - name: shopId
       value: 6a59bb07132d651de75c66e5
       type: path
+  body:
+    type: json
+    data: |-
+      {
+        "isDisabled": true
+      }
   auth: inherit
 
 settings:
