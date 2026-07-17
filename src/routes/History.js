@@ -7,9 +7,13 @@ const History = require('../models/History');
 // -------------------------------------------------------------------------- //
 
 router.get('/', async (req, res) => {
-  const query = (req.token.sid)
-    ? { shop: req.token.sid }
-    : { createdBy: req.token.uid };
+  let query;
+
+  if (!req.token.isAdmin) {
+    query = (req.token.sid)
+      ? { shop: req.token.sid }
+      : { createdBy: req.token.uid };
+  }
 
   const history = await History.find(query)
     .populate(History.historyPopulate);
