@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const adminSchema = new mongoose.Schema({
+const ownerSchema = new mongoose.Schema({
 
   user: {
     ref: 'User',
@@ -8,10 +8,21 @@ const adminSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
   },
 
+  shop: {
+    ref: 'Shop',
+    required: [true, 'Shop is required'],
+    type: mongoose.Schema.Types.ObjectId,
+  },
+
   appointedBy: {
     ref: 'User',
     required: [true, 'Appointing user is required'],
     type: mongoose.Schema.Types.ObjectId,
+  },
+
+  appointedByAdmin: {
+    type: Boolean,
+    required: true,
   },
 
   appointedAt: {
@@ -26,8 +37,8 @@ const adminSchema = new mongoose.Schema({
 
 }, { timestamps: false, versionKey: false });
 
-adminSchema.index({ user: 1 }, { unique: true });
+ownerSchema.index({ user: 1, shop: 1 }, { unique: true });
 
-const Admin = mongoose.model('Admin', adminSchema);
+const Owner = mongoose.model('Owner', ownerSchema);
 
-module.exports = Admin;
+module.exports = Owner;

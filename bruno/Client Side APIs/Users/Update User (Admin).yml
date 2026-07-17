@@ -1,0 +1,26 @@
+info:
+  name: Update User (Admin)
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{host}}/api/users/:userId"
+  params:
+    - name: userId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Abdul Ahad",
+        "number": "923235400291"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

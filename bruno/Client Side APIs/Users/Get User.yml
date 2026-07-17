@@ -1,7 +1,7 @@
 info:
   name: Get User
   type: http
-  seq: 3
+  seq: 2
 
 http:
   method: GET

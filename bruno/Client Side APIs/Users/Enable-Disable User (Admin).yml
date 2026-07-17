@@ -1,11 +1,11 @@
 info:
-  name: Update User
+  name: Enable/Disable User (Admin)
   type: http
-  seq: 4
+  seq: 6
 
 http:
-  method: PUT
-  url: "{{host}}/api/users/:userId"
+  method: PATCH
+  url: "{{host}}/api/users/:userId/isDisabled"
   params:
     - name: userId
       value: ""
@@ -14,8 +14,7 @@ http:
     type: json
     data: |-
       {
-        "name": "Abdul Ahad",
-        "number": "923235400291"
+        "isDisabled": true
       }
   auth: inherit
 

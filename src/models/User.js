@@ -1,37 +1,31 @@
 const mongoose = require('mongoose');
 
-// TODO: add validations
-
 const userSchema = new mongoose.Schema({
+
   name: {
+    type: String,
     default: '',
-    type: String,
+    trim: true,
+    maxlength: [100, 'Name cannot exceed 100 characters'],
+    match: [/^[\p{L}\p{N}\s.,'&()\-]*$/u, 'Name contains invalid characters'],
   },
-  balance: {
-    default: 0,
-    type: Number,
-    required: true,
-  },
+
   number: {
-    index: true,
-    unique: true,
     type: String,
-    required: true,
+    required: [true, 'Phone number is required'],
+    unique: true,
+    trim: true,
+    set: (v) => (typeof v === 'string' ? v.replace(/[\s\-()+]/g, '') : v),
+    match: [/^923\d{9}$/, 'Phone number must be in 92XXXXXXXXXX format (e.g. 923001234567)'],
   },
+
   isDisabled: {
-    default: false,
     type: Boolean,
     required: true,
+    default: false,
   },
-  pushTokens: {
-    default: [],
-    required: true,
-    type: [ String ],
-  }
-}, {
-  timestamps: false,
-  versionKey: false,
-});
+
+}, { timestamps: false, versionKey: false, });
 
 const User = mongoose.model('User', userSchema);
 

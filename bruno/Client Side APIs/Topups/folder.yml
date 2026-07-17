@@ -1,7 +1,7 @@
 info:
   name: Topups
   type: folder
-  seq: 11
+  seq: 10
 
 request:
   auth: inherit

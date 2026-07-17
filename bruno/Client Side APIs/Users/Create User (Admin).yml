@@ -1,0 +1,22 @@
+info:
+  name: Create User (Admin)
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/users"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Abdul Ahad",
+        "number": "923235400291"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,17 +1,20 @@
 info:
-  name: Create User
+  name: Update User (User)
   type: http
-  seq: 1
+  seq: 4
 
 http:
-  method: POST
-  url: "{{host}}/api/users"
+  method: PUT
+  url: "{{host}}/api/users/:userId"
+  params:
+    - name: userId
+      value: ""
+      type: path
   body:
     type: json
     data: |-
       {
-        "name": "Abdul Ahad",
-        "number": "923235400291"
+        "name": "Abdul Ahad"
       }
   auth: inherit
 
