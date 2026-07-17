@@ -1,5 +1,5 @@
 info:
-  name: Get My History
+  name: List History
   type: http
   seq: 1
 
