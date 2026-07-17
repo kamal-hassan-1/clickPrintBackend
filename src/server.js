@@ -35,9 +35,9 @@ app.use(cors({
 const required = [
   'JWT_SECRET',
   'SERVICE_KEY',
+  'EXPO_ACCESS_TOKEN',
   'MONGODB_URI',
   'NOTIFYBOT_URL',
-  'EXPO_ACCESS_TOKEN',
 ];
 
 process.env.GOTENBERG_URL = process.env.GOTENBERG_URL || 'http://gotenberg:3000';
@@ -49,8 +49,6 @@ for (const v of required) {
     process.exit(1);
   }
 }
-
-process.env.SERVICE_TOKEN = jwt.sign({ actor: 'service' }, process.env.JWT_SECRET);
 
 // -------------------------------------------------------------------------- //
 
