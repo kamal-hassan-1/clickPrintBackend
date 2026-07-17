@@ -1,7 +1,7 @@
-name: dev
+name: local
 variables:
   - name: host
-    value: https://click-print-backend-dev.wckd.pk
+    value: http://localhost:3000
   - secret: true
     name: token
   - secret: true

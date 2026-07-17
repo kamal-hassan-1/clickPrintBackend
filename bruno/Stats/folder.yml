@@ -1,7 +1,7 @@
 info:
-  name: Webhooks
+  name: Stats
   type: folder
-  seq: 3
+  seq: 11
 
 request:
   auth: inherit
