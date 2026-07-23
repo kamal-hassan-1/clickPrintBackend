@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0,
+  },
+
+  pushTokens: {
+    type: [String],
+    default: [],
   }
 
 }, { timestamps: false, versionKey: false, });
