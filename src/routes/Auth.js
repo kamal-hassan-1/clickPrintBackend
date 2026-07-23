@@ -7,6 +7,7 @@ const Otp = require('../models/Otp');
 const Shop = require('../models/Shop');
 const User = require('../models/User');
 const Admin = require('../models/Admin');
+const Owner = require('../models/Owner');
 
 const { keyAuth } = require('../func/auth');
 const { resp, sendViaNotifyBot, isValidE164NoPlus } = require('../func/misc');
@@ -45,8 +46,8 @@ router.post('/otp', async (req, res) => {
     if (!user) {
       return resp(res, 404, 'No registered user found with this number');
     }
-    const shop = await Shop.findOne({ owner: user._id });
-    if (!shop) {
+    const ownerDoc = await Owner.findOne({ user: user._id });
+    if (!ownerDoc) {
       return resp(res, 404, 'No registered shop found for this user');
     }
   }
@@ -67,7 +68,13 @@ router.post('/otp', async (req, res) => {
     { upsert: true, returnDocument: 'after' }
   );
 
-  await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
+  try {
+    await sendViaNotifyBot(number, `[ClickPrint] Your login OTP is: ${code}`);
+  } catch (err) {
+    console.error('[ERROR] Failed to send OTP via NotifyBot:', err.message);
+    return resp(res, 502, `Failed to send OTP: ${err.message}`);
+  }
+
   return resp(res, 200, 'otp sent');
 });
 
@@ -104,7 +111,8 @@ router.post('/verify', async (req, res) => {
     { upsert: true, returnDocument: 'after' }
   );
 
-  const shop = await Shop.findOne({ owner: user._id });
+  const ownerDoc = await Owner.findOne({ user: user._id });
+  const shop = ownerDoc ? await Shop.findById(ownerDoc.shop) : null;
   const admin = await Admin.findOne({ user: user._id });
 
   const payload = { uid: user._id, isAdmin: !!admin };

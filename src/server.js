@@ -95,6 +95,9 @@ app.use('/api/printers', jwtAuth, require('./routes/Printers.js'));
 
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err);
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
+    return resp(res, 400, err.message);
+  }
   resp(res, 500, 'Internal Server Error');
 });
 

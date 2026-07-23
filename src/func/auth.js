@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { resp } = require('./misc');
+const Owner = require('../models/Owner');
 
-exports.jwtAuth = (req, res, next) => {
+exports.jwtAuth = async (req, res, next) => {
   const header = req.headers.authorization;
   if (!header) return resp(res, 401, 'Missing Authorization Header');
 
@@ -12,7 +13,14 @@ exports.jwtAuth = (req, res, next) => {
   if (!token) return resp(res, 401, 'Malformed Authorization Header');
 
   try {
-    req.token = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (payload && payload.uid && !payload.sid) {
+      const ownerDoc = await Owner.findOne({ user: payload.uid }).lean();
+      if (ownerDoc) {
+        payload.sid = ownerDoc.shop;
+      }
+    }
+    req.token = payload;
     return next();
   } catch (err) {
     return resp(res, 401, 'Invalid or Expired JWT');

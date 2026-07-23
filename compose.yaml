@@ -10,7 +10,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - 3000:3000
+      - 3005:3000
     volumes:
       - ./files:/app/files
     environment:
@@ -19,3 +19,6 @@ services:
       EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN}
       MONGODB_URI: ${MONGODB_URI}
       NOTIFYBOT_URL: ${NOTIFYBOT_URL}
+      NOTIFYBOT_API_KEY: ${NOTIFYBOT_API_KEY}
+      GOTENBERG_URL: ${GOTENBERG_URL:-http://gotenberg:3000}
+      GOTENBERG_WEBHOOK_URL: ${GOTENBERG_WEBHOOK_URL:-http://backend:3000}

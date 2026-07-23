@@ -3,7 +3,9 @@ const router = express.Router();
 
 const Shop = require('../models/Shop');
 const File = require('../models/File');
+const Service = require('../models/Service');
 
+const { extrapolateCapabilities } = require('../func/shops');
 const { resp, validateObjectIds } = require('../func/misc');
 
 // -------------------------------------------------------------------------- //
@@ -29,16 +31,37 @@ router.post('/', async (req, res) => {
 // -------------------------------------------------------------------------- //
 
 router.get('/{:shopId}', validateObjectIds('shopId', { allowEmpty: true }), async (req, res) => {
-    if (req.params.shopId) {
+  if (req.params.shopId) {
     const shop = await Shop.findById(req.params.shopId).lean();
 
     if (!shop) return resp(res, 404, 'not found');
+
+    const services = await Service.find({ shop: shop._id }).lean();
+    shop.services = services;
+    shop.capabilities = extrapolateCapabilities(services);
+
     return resp(res, 200, 'fetched shop', { shop });
   }
 
   const filter = req.token.isAdmin ? {} : { isDisabled: false };
+  const shops = await Shop.find(filter).lean();
+  const shopIds = shops.map((s) => s._id);
 
-  return resp(res, 200, 'fetched shops', { shops: await Shop.find(filter) });
+  const services = await Service.find({ shop: { $in: shopIds } }).lean();
+  const servicesByShop = {};
+  for (const s of services) {
+    const sid = s.shop.toString();
+    if (!servicesByShop[sid]) servicesByShop[sid] = [];
+    servicesByShop[sid].push(s);
+  }
+
+  for (const shop of shops) {
+    const shopServices = servicesByShop[shop._id.toString()] || [];
+    shop.services = shopServices;
+    shop.capabilities = extrapolateCapabilities(shopServices);
+  }
+
+  return resp(res, 200, 'fetched shops', { shops });
 });
 
 // -------------------------------------------------------------------------- //

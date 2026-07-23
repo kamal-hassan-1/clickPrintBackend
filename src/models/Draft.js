@@ -31,7 +31,8 @@ const settingsSchema = new mongoose.Schema({
   },
   pageSelection: {
     type: String,
-    required: function () { return this.pageSelection !== ""; },
+    required: false,
+    default: '',
   },
 }, {
   _id: false,
@@ -43,7 +44,7 @@ const fileSchema = new mongoose.Schema({
   file: {
     ref: 'File',
     required: true,
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
   },
   settings: {
     required: false,

@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Admin = require('../models/Admin');
 const Shop = require('../models/Shop');
+const Owner = require('../models/Owner');
 
 const { resp } = require('../func/misc');
 
@@ -15,7 +16,7 @@ router.get('/users', async (req, res) => {
   // distinct() flattens array fields, so this holds if a shop gains many owners.
   const [ adminIds, ownerIds ] = await Promise.all([
     Admin.distinct('user'),
-    Shop.distinct('owner'),
+    Owner.distinct('user'),
   ]);
 
   // The buckets partition the users, so admins take precedence over owners and

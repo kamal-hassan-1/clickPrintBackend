@@ -5,7 +5,7 @@ const router = express.Router();
 const Job = require('../models/Job');
 const File = require('../models/File');
 const Shop = require('../models/Shop');
-const Price = require('../models/Price');
+const Service = require('../models/Service');
 const Draft = require('../models/Draft');
 
 const { runSideEffects } = require('../func/jobs');
@@ -18,9 +18,7 @@ const { resp, validateObjectIds } = require('../func/misc');
 router.post('/', async (req, res) => {
   const { files, shop } = req.body || {};
 
-  // TODO: validateObjectIds shop
-  
-  if (shop && !await Shop.exists({ _id: shop })) {
+  if (shop && (!mongoose.isValidObjectId(shop) || !await Shop.exists({ _id: shop }))) {
     return resp(res, 400, 'shop does not exist');
   }
 
@@ -30,9 +28,7 @@ router.post('/', async (req, res) => {
     }
 
     for (const [index, file] of files.entries()) {
-      // TODO: validateObjectIds file.file
-
-      if (!file.file || !await File.exists({ _id: file.file })) {
+      if (!file || typeof file !== 'object' || !file.file || typeof file.file !== 'string' || !await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
       }
     }
@@ -77,7 +73,7 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
       return resp(res, 400, 'shop cannot be cleared');
     }
 
-    if (!await Shop.exists({ _id: shop })) {
+    if (!mongoose.isValidObjectId(shop) || !await Shop.exists({ _id: shop })) {
       return resp(res, 400, 'shop does not exist');
     }
 
@@ -90,9 +86,7 @@ router.patch('/:draftId', validateObjectIds('draftId'), async (req, res) => {
     }
 
     for (const file of files) {
-      // TODO: validateObjectIds file.file
-
-      if (!file.file || !await File.exists({ _id: file.file })) {
+      if (!file || typeof file !== 'object' || !file.file || typeof file.file !== 'string' || !await File.exists({ _id: file.file })) {
         return resp(res, 400, `file does not exist`);
       }
     }
@@ -144,10 +138,10 @@ router.patch('/:draftId/check', validateObjectIds('draftId'), async (req, res, n
   }
 
   await draft.populate(Draft.draftPopulate);
-  const prices = await Price.find({ shop: draft.shop }).lean();
+  const services = await Service.find({ shop: draft.shop }).lean();
 
   try {
-    draft.cost = calculateJobCost(draft.files, prices);
+    draft.cost = calculateJobCost(draft.files, services);
   }
   catch (err) {
     return resp(res, 400, `unable to price job (${err.message})`);
@@ -184,10 +178,10 @@ router.patch('/:draftId/submit', validateObjectIds('draftId'), async (req, res, 
   }
 
   await draft.populate(Draft.draftPopulate);
-  const prices = await Price.find({ shop: draft.shop }).lean();
+  const services = await Service.find({ shop: draft.shop }).lean();
 
   try {
-    draft.cost = calculateJobCost(draft.files, prices);
+    draft.cost = calculateJobCost(draft.files, services);
   }
   catch (err) {
     return resp(res, 400, `unable to price job (${err.message})`);

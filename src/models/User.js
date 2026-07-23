@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
 
+  balance: {
+    type: Number,
+    required: true,
+    default: 0,
+  }
+
 }, { timestamps: false, versionKey: false, });
 
 const User = mongoose.model('User', userSchema);

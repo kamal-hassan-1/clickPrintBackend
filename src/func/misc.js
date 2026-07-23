@@ -42,14 +42,34 @@ exports.validateObjectIds = (...args) => (req, res, next) => {
 };
 
 exports.sendViaNotifyBot = async (number, message) => {
-  return await fetch(process.env.NOTIFYBOT_URL, {
+  const chatId = number.startsWith('+') ? number : `+${number}`;
+  const apiKey = process.env.NOTIFYBOT_API_KEY || process.env.SERVICE_KEY;
+
+  if (!process.env.NOTIFYBOT_URL) {
+    throw new Error('NOTIFYBOT_URL environment variable is not defined');
+  }
+
+  const baseUrl = process.env.NOTIFYBOT_URL;
+  const url = baseUrl.endsWith('/send') ? baseUrl : `${baseUrl.replace(/\/$/, '')}/send`;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...(apiKey ? { 'x-api-key': apiKey } : {}),
     },
     body: JSON.stringify({
-      chatId: `${number}@c.us`,
+      apiKey,
+      chatId,
       message
     })
   });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const errorMessage = errorData.message || errorData.error || `NotifyBot HTTP ${response.status}`;
+    throw new Error(errorMessage);
+  }
+
+  return response;
 };
